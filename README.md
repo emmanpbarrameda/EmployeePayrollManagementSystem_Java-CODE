@@ -51,8 +51,8 @@
 
 - Screenshots
 <p align="center">
-  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console_image1.png" width="400" alt="Console Image" />
-  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console_image2.png" width="400" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image1.png" width="200" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image2.png" width="400" alt="Console Image" />
 </p>
 
 <br>
