@@ -119,8 +119,8 @@
 <!-- ------ -->
 
 ## 💡 **Technologies used**
-- <b>Java Programming Language: </b> Developed using Java, a versatile and widely-used programming language.
-- <b>Java Swing: </b>  Employed for creating an interactive user interface.
+- <b>Java Programming Language: </b> This Application is Developed using Java.
+- <b>Java Swing: </b>  Is used to create an interactive user interface.
 - <b>FlatLaf: </b> A Java library that gives a modern and flat look to Swing applications, providing customizable UI components and themes for an enhanced visual experience.
 - <b>SQLite Database: </b>  Utilized for efficient data storage and retrieval.
 - <b>NetBeans Apache IDE: </b>  Chosen as the development environment for its comprehensive tools and features.
