@@ -180,7 +180,7 @@ In short, the MIT License states:
 <br><i>Note: Make sure to Install the Required softwares on [Depencies](#%EF%B8%8F-dependencies-for-java-developers).</i>
 
 - <b>NOTE For Developers: </b>
--- To <b>run the .jar version</b> of this application <b>without encountering database errors</b> <b><u>after building it on NetBeans Apache </b></u> or if the <b><u>"data"</u></b> folder <b><u>is not found</u></b> in the <b>"dist"</b> folder, <b><i>simply copy</i></b> the <b><u>"data"</u></b> folder from the <b><i>main directory</i></b> of the source code and <b><i>paste it inside</i></b> the <b><u>"dist"</u></b> folder.
+-- The <b>SQLite database</b> of this application is <b>embedded within the application itself</b>. It is <b>located</b> at the <i>path /src/SystemDB/database.sqlite</i>. You can <b>configure</b> the database using [SQLite Browser](https://github.com/sqlitebrowser/sqlitebrowser/releases).
 
 <br>
 
