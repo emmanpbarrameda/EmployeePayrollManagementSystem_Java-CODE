@@ -43,7 +43,7 @@ In short, the MIT License states:
 <!-- ------ -->
 
 ## 🚀 **Download Installer (for User Testing)**
-- <b>Download Installer [here](https://github.com/emmanpbarrameda/CTSSystem_Java-CODE/tree/main#-download-installer-for-users) </b>
+- <b>Download Installer [here](https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/tree/main#-download-installer-for-users) </b>
 <br><i>Follow the installation steps and feel free to explore the application.</i>
 <br>
 
