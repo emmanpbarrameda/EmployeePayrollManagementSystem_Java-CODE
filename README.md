@@ -38,40 +38,75 @@
 <!-- ------ -->
 
 ## 🖍 About
-- The <b>"Zodiac Sign, Age, and Birthstone System"</b> by Emman P. Barrameda is a continuation project based on my class activity during my time in Grade 12 about Java Swing. Due to the boredom of the Covid-19 lockdown, I decided to continue, improve, and redevelop this ZAB System. The system consists of an installer and a main Java application. I hope you appreciate this project, and if you have any questions, please feel free to [contact me](#get-in-touch).
+- The <b>"Employee Payroll Management System"</b> by Emman P. Barrameda is my practice project based on Java Swing, developed during the Covid lockdown in May 2020. This system was created to enhance my knowledge in desktop development as a Desktop Developer. It consists of an installer, a main application and an embedded SQLite database. Furthermore, this project is open for further development and improvements. I hope you appreciate this project, and if you have any questions, please feel free to [contact me](#get-in-touch).
+
 <br>
 
 <!-- ------ -->
 
 ## 💻 User Interface
-- GIF Preview
+
+- <b>Login GUI Preview</b>
 <p align="center">
-  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console_video.gif" width="600" alt="Console GIF" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image1.png" width="300" alt="Console Image" />
 </p>
 
-- Screenshots
+- <b>Admin GUIs Preview</b>
 <p align="center">
-  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image1.png" width="200" alt="Console Image" />
-  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image2.png" width="400" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image2.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image3.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image4.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image5.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image6.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image7.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image8.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image9.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image10.png" width="600" alt="Console Image" />
 </p>
 
+- <b>Generated Payslip Preview</b>
+<p align="center">
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image11.png" width="600" alt="Console Image" />
+</p>
+
+- <b>Super Admin GUIs Preview</b>
+<p align="center">
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image12.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image13.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image14.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image15.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image16.png" width="600" alt="Console Image" />
+  <img src="https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/blob/main/output-media/console-image17.png" width="600" alt="Console Image" />
+</p>
+
+
+<br>
 <br>
 <!-- ------ -->
 
 ## 👨‍💻 **System Features**
-- Installer (.exe)
-- Splash Screen
-- Number/Alphabeth Error Trapping
-- Friendly UI
-- Zodiac Sign, Age and Birthstone Finder
+- <b>Installer: </b> Provides an executable (.exe) file for easy installation.
+- <b>Open Source Java Code: </b> The system is developed using open-source Java code, allowing for customization and flexibility.<br> Read the [LICENSE](https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE#-license) for more information.
+- <b>Splash Screen: </b> Displays an attractive introductory screen during system startup.
+- <b>Error Trapping: </b> Detects and handles errors related to invalid numbers or alphabetic inputs.
+- <b>Login System: </b> Allows authorized users to access the system securely.
+- <b>Manageable User Accounts: </b> Enables the creation, modification, and deletion of user accounts.
+- <b>Two User Types: </b> Admin and Super Admin - (with varying levels of privileges)
+- <b>Manageable Employee Data: </b> Facilitates the addition, editing, and removal of employee information.
+- <b>Payslip PDF Generator: </b> Automatically generates PDF payslips for employees.
+- <b>Audit Trail: </b> Tracks and records all system activities, ensuring accountability and transparency.
+- <b>Configurable System Settings: </b> Allows customization of various system parameters as per requirements.
 <br>
+
 <!-- ------ -->
 
 ## 💡 **Technologies used**
-- Java Programming Language
-- Java Swing
-- SQLITE Database
-- NetBeans Apache IDE
+- <b>Java Programming Language: </b> Developed using Java, a versatile and widely-used programming language.
+- <b>Java Swing: </b>  Employed for creating an interactive user interface.
+- <b>FlatLaf: </b> A Java library that gives a modern and flat look to Swing applications, providing customizable UI components and themes for an enhanced visual experience.
+- <b>SQLite Database: </b>  Utilized for efficient data storage and retrieval.
+- <b>NetBeans Apache IDE: </b>  Chosen as the development environment for its comprehensive tools and features.
+
 <br>
 <!-- ------ -->
 
@@ -126,11 +161,11 @@ In short, the MIT License states:
 <br>
 
 ## 🚀 **Download Installer (for Users)**
-<b>Download Installer of <i> Zodiac Sign, Age and Birthstone </i> below </b>
+<b>Download Installer of <i> Employee Payroll Management System </i> below </b>
 
 > | <b>Version</b> | <b>Description</b> | <b>Download</b> |
 > |---------|-------------|----------|
-> | 1.0.0   | Initial Public release | [Download Installer](https://mega.nz/file/bl53UbyZ#olcvThRQ011ZnKeFxId_uyfchpjHcYGLuSzu6LRGjlk) |
+> | 2.0.0   | Initial Public release | [Download Installer](https://mega.nz/file/bl53UbyZ#olcvThRQ011ZnKeFxId_uyfchpjHcYGLuSzu6LRGjlk) |
 
 > <i>Follow the installation steps and feel free to explore the application.</i>
 <br>
@@ -140,7 +175,13 @@ In short, the MIT License states:
 <!-- ------ -->
 
 ## ⚡ **Account Settings**
-- None.
+- Userlevel: <b> Admin </b>
+> Username: Admin1 <br>
+> Password: 87654321
+
+- Userlevel: <b> Super Admin </b>
+> Username: Admin2 <br>
+> Password: 87654321
 <br>
 
 <!-- ------ -->
