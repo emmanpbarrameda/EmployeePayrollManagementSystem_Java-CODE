@@ -1,7 +1,0 @@
-Userlevel: Admin
-Username: Admin1
-Password: 87654321
-
-Userlevel: Super Admin
-Username: Admin2
-Password: 87654321
