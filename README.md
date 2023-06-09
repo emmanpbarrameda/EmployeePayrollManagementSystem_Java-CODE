@@ -123,6 +123,7 @@
 - <b>Java Swing: </b>  Is used to create an interactive user interface.
 - <b>FlatLaf: </b> A Java library that gives a modern and flat look to Swing applications, providing customizable UI components and themes for an enhanced visual experience.
 - <b>SQLite Database: </b>  Utilized for efficient data storage and retrieval.
+- <b>SQLite Browser: </b> Is a user-friendly application for managing and working with SQLite databases. It enables the easiest way to view, edit, and query SQLite files.
 - <b>NetBeans Apache IDE: </b>  Chosen as the development environment for its comprehensive tools and features.
 
 <br>
@@ -131,6 +132,7 @@
 ## ⚙️ **Dependencies for Java Developers**
 - [Java JDK 11](https://mega.nz/file/msIwmYjC#qpJL7LFHxTwUkI3jauAH2GQE_xM8ULeVPojfSsZ0KAY)
 - [NetBeans Apache IDE](https://dlcdn.apache.org/netbeans/netbeans-installers/18/Apache-NetBeans-18-bin-windows-x64.exe)
+- [SQLite Browser](https://github.com/sqlitebrowser/sqlitebrowser/releases)
 <br>
 
 <!-- ------ -->
