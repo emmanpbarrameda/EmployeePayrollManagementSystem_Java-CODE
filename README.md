@@ -4,19 +4,21 @@
 <!-- tag line -->
 <h3 align='center'> Employee Payroll Management System<br> using Java Swing GUI (CODE) </h3>
 
+
 <!-- personal badges -------------------------------------->
 <br>
 <p align="center">
 
+  <!-- my name -->
   <img src='https://svgshare.com/i/u5n.svg' />
   
   <!-- open source -->
   <img src='https://forthebadge.com/images/badges/open-source.svg' />
-  
+
 </p>  
   
 <!-- primary badges -------------------------------------->
-<p align="center">
+<p align="center" style="margin-bottom: 0;">
   
   <!-- language -->
   <img src='https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white' />  
