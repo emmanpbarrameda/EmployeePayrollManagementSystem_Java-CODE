@@ -10,10 +10,15 @@
 <p align="center">
 
   <!-- my name -->
-  <img src='https://svgshare.com/i/u5n.svg' />
+  <img alt='/e/' src='https://img.shields.io/badge/MADE_BY - EMMAN_P_BARRAMEDA-100000?style=for-the-badge&logo=/e/&logoColor=1877F2&labelColor=FFFFFF&color=1877F2'/>
   
   <!-- open source -->
-  <img src='https://forthebadge.com/images/badges/open-source.svg' />
+  <img alt='Git' src='https://img.shields.io/badge/OPEN_SOURCE-100000?style=for-the-badge&logo=Git&logoColor=FFF9F9&labelColor=FE7D37&color=FE7D37'/>
+  
+  <!-- private -->
+  <!-- 
+  <img alt='Pocket' src='https://img.shields.io/badge/PRIVATE_CODE-100000?style=for-the-badge&logo=Pocket&logoColor=FFFFFF&labelColor=343434&color=343434'/>
+  -->
 
 </p>  
   
