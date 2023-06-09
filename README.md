@@ -4,6 +4,17 @@
 <!-- tag line -->
 <h3 align='center'> Employee Payroll Management System<br> using Java Swing GUI (CODE) </h3>
 
+<!-- personal badges -------------------------------------->
+<br>
+<p align="center">
+
+  <img src='https://svgshare.com/i/u5n.svg' />
+  
+  <!-- open source -->
+  <img src='https://forthebadge.com/images/badges/open-source.svg' />
+  
+</p>  
+  
 <!-- primary badges -------------------------------------->
 <p align="center">
   
