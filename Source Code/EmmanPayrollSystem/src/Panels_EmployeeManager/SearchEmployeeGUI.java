@@ -87,7 +87,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public SearchEmployeeGUI() throws SQLException, IOException {
+    public SearchEmployeeGUI() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c=new DBconnection();
@@ -145,46 +145,48 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Fetching GUI naming data from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (
+            Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)
+        ) {
+            if (rsGNaming.next()) {
+                // GUI Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
                 lblTitle.setText(mainAppNameFromDB);
                 this.setTitle(mainAppNameFromDB);
-                
-                //company name
-                companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
-                pesoSignString = rsGNaming.getString("CurrencySign");
-                
-                //set the Default Normal Popups Title Message
-                mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
-                mainErrorString = rsGNaming.getString("PopupError");
-                
-                stGNaming.close();
-            }
-            rsGNaming.close();
-            
-        } catch (SQLException e) {
-        }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
+                System.out.println("[INFO] MainAppName: " + mainAppNameFromDB);
 
+                // Company Name
+                companyNameFromDB = rsGNaming.getString("MainCompanyName");
+                System.out.println("[INFO] MainCompanyName: " + companyNameFromDB);
+
+                // Currency Symbol
+                pesoSignString = rsGNaming.getString("CurrencySign");
+                System.out.println("[INFO] CurrencySign: " + pesoSignString);
+
+                // Popup Titles
+                mainnameString = rsGNaming.getString("PopupNormal");
+                mainErrorString = rsGNaming.getString("PopupError");
+                System.out.println("[INFO] PopupNormal: " + mainnameString);
+                System.out.println("[INFO] PopupError: " + mainErrorString);
+            } else {
+                System.err.println("[WARN] 'guinames' table is empty.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[ERROR] Error reading from 'guinames': " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // Optionally assign or update other related strings if needed
+        // mainPopupTitleNormalGUI = mainnameString;
+        // mainPopupTitleErrorGUI = mainErrorString;
+        // mainAppNameString = mainAppNameFromDB;
     }
     
     public void clearall() {
@@ -940,7 +942,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
                 //with image
                 if (person_image!=null) {
                                                       //1     2           3        4      5        6          7           8          9       10       11       12          13          14          15           16        17           18
-                query1 = "UPDATE EmployeesRecord SET id=?,first_name=?,surname=?,Dob=?,Email=?,Telephone=?,Address=?,Department=?,Image=?,Gender=?,Salary=?,Address2=?,Apartment=?,Post_code=?,Designation=?,Status=?,Date_hired=?,job_title=? WHERE id='"+value1+"'";
+                query1 = "UPDATE employeesrecord SET id=?,first_name=?,surname=?,Dob=?,Email=?,Telephone=?,Address=?,Department=?,Image=?,Gender=?,Salary=?,Address2=?,Apartment=?,Post_code=?,Designation=?,Status=?,Date_hired=?,job_title=? WHERE id='"+value1+"'";
 
                 pst = conn.prepareStatement(query1);
                 
@@ -984,7 +986,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
                 } else {
                     
                                                           //1     2            3        4     5         6          7          8          9         10       11         12         13            14          15        16           17       
-                    query2 = "UPDATE EmployeesRecord SET id=?,first_name=?,surname=?,Dob=?,Email=?,Telephone=?,Address=?,Department=?,Gender=?,Salary=?,Address2=?,Apartment=?,Post_code=?,Designation=?,Status=?,Date_hired=?,job_title=? WHERE id='"+value2+"'";
+                    query2 = "UPDATE employeesrecord SET id=?,first_name=?,surname=?,Dob=?,Email=?,Telephone=?,Address=?,Department=?,Gender=?,Salary=?,Address2=?,Apartment=?,Post_code=?,Designation=?,Status=?,Date_hired=?,job_title=? WHERE id='"+value2+"'";
                 }
                 
                 pst = conn.prepareStatement(query2);
@@ -1037,7 +1039,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
             String values = dateString;
             String val = txt_emp.getText();
             try{
-                String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+values+"','Record of Employee #"+txt_id.getText()+" is Updated by: "+val+"')";
+                String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+values+"','Record of Employee #"+txt_id.getText()+" is Updated by: "+val+"')";
                 pst=conn.prepareStatement(reg);
                 pst.execute();
             } catch (SQLException e) {
@@ -1073,7 +1075,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
             String value1 = dateString;
             String val = txt_emp.getText();
             try{
-                String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Record of Employee #"+txt_id.getText()+" is Deleted by: "+val+"')";
+                String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Record of Employee #"+txt_id.getText()+" is Deleted by: "+val+"')";
                 pst=conn.prepareStatement(reg);
                 pst.execute();
             }
@@ -1082,7 +1084,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
             {
                 JOptionPane.showMessageDialog(null,e);
             }
-            String sql ="delete from EmployeesRecord where id=? ";
+            String sql ="delete from employeesrecord where id=? ";
             try{
                 pst=conn.prepareStatement(sql);
                 pst.setString(1, txt_id.getText());
@@ -1106,7 +1108,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
             }
             try{
 
-                String sq ="delete from Users where emp_id =?";
+                String sq ="delete from users where emp_id =?";
                 pst=conn.prepareStatement(sq);
                 pst.setString(1, txt_id.getText());
                 pst.execute();
@@ -1133,7 +1135,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
                 txt_search.requestFocusInWindow();
             }
         
-            String sql ="select * from EmployeesRecord where id=? ";
+            String sql ="select * from employeesrecord where id=? ";
 
             pst=conn.prepareStatement(sql);
             pst.setString(1,txt_search.getText());
@@ -1417,7 +1419,7 @@ public final class SearchEmployeeGUI extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new SearchEmployeeGUI().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(SearchEmployeeGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

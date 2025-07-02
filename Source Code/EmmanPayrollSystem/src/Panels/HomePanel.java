@@ -58,7 +58,7 @@ public final class HomePanel extends javax.swing.JPanel {
      * @throws java.sql.SQLException
      */
       
-    public HomePanel() throws IOException, SQLException {
+    public HomePanel() throws IOException, SQLException, ClassNotFoundException {
         initComponents();
         
         DBconnection c=new DBconnection();
@@ -93,44 +93,47 @@ public final class HomePanel extends javax.swing.JPanel {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Loading GUI naming data from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)) {
+
+            if (rsGNaming.next()) {
+                // GUI Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
-                //this.setTitle(mainAppNameFromDB);
-                
-                //company name
+                System.out.println("[INFO] MainAppName: " + mainAppNameFromDB);
+
+                // Company Name
                 companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
+                System.out.println("[INFO] CompanyName: " + companyNameFromDB);
+
+                // Currency Symbol
                 pesoSignString = rsGNaming.getString("CurrencySign");
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] CurrencySign: " + pesoSignString);
+
+                // Popup Titles
                 mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
+                System.out.println("[INFO] PopupNormal: " + mainnameString);
+
                 mainErrorString = rsGNaming.getString("PopupError");
-                
-                stGNaming.close();
+                System.out.println("[INFO] PopupError: " + mainErrorString);
+
+                // Optional: assign to external/global variables
+                // mainPopupTitleNormalGUI = mainnameString;
+                // mainPopupTitleErrorGUI = mainErrorString;
+                // mainAppNameString = mainAppNameFromDB;
+
+            } else {
+                System.err.println("[WARN] No data found in 'guinames' table.");
             }
-            rsGNaming.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to load GUI naming data.");
+            e.printStackTrace();
         }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
     }
 
     //HOME panel time
@@ -165,7 +168,7 @@ public final class HomePanel extends javax.swing.JPanel {
     public void counthome() throws SQLException { 
         ResultSet rsTOTAL;
         try (Statement stTOTAL = conn.createStatement()) {
-            rsTOTAL = stTOTAL.executeQuery("select count(*) from EmployeesRecord");
+            rsTOTAL = stTOTAL.executeQuery("select count(*) from employeesrecord");
             rsTOTAL.next();
             totalempTFhome.setText(rsTOTAL.getInt("count(*)")+"");
             

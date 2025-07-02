@@ -33,8 +33,8 @@
   <img src='https://img.shields.io/badge/apache%20netbeans-1B6AC6?style=for-the-badge&logo=apache%20netbeans%20IDE&logoColor=white' />  
   <img src='https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=Oracle&logoColor=white' />   
   
-  <!-- sqlite -->
-  <img src='https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white' />    
+  <!-- mysql -->
+  <img src='https://img.shields.io/badge/MySQL-07405E?style=for-the-badge&logo=mysql&logoColor=white' />    
   
 </p>
 
@@ -56,7 +56,7 @@
 <!-- ------ -->
 
 ## 🖍 About
-- The <b>"Employee Payroll Management System"</b> by Emman P. Barrameda is my practice project based on Java Swing, developed during the Covid lockdown in May 2020. This system was created to enhance my knowledge in desktop development as a Desktop Developer. It consists of an installer, a main application and an embedded SQLite database. Furthermore, this project is open for further development and improvements. I hope you appreciate this project, and if you have any questions, please feel free to [contact me](#get-in-touch).
+- The <b>"Employee Payroll Management System"</b> by Emman P. Barrameda is my practice project based on Java Swing, developed during the Covid lockdown in May 2020. This system was created to enhance my knowledge in desktop development as a Desktop Developer. It consists of an installer, a main application and an MySQL database. Furthermore, this project is open for further development and improvements. I hope you appreciate this project, and if you have any questions, please feel free to [contact me](#get-in-touch).
 
 <br>
 
@@ -122,19 +122,10 @@
 - <b>Java Programming Language: </b> This Application is Developed using Java.
 - <b>Java Swing: </b>  Is used to create an interactive user interface.
 - <b>FlatLaf: </b> A Java library that gives a modern and flat look to Swing applications, providing customizable UI components and themes for an enhanced visual experience.
-- <b>SQLite Database: </b>  Utilized for efficient data storage and retrieval.
-- <b>SQLite Browser: </b> Is a user-friendly application for managing and working with SQLite databases. It enables the easiest way to view, edit, and query SQLite files.
+- <b>MySQL Workbench: </b>  Is a user-friendly application for managing and working with Database file. It enables the easiest way to view, edit, and query MySQL files.
 - <b>NetBeans Apache IDE: </b>  Chosen as the development environment for its comprehensive tools and features.
 
 <br>
-<!-- ------ -->
-
-## ⚙️ **Dependencies for Java Developers**
-- [Java JDK 11](https://mega.nz/file/msIwmYjC#qpJL7LFHxTwUkI3jauAH2GQE_xM8ULeVPojfSsZ0KAY)
-- [NetBeans Apache IDE](https://dlcdn.apache.org/netbeans/netbeans-installers/18/Apache-NetBeans-18-bin-windows-x64.exe)
-- [SQLite Browser](https://github.com/sqlitebrowser/sqlitebrowser/releases)
-<br>
-
 <!-- ------ -->
 
 ## 📝 **License**
@@ -143,7 +134,7 @@ This project is licensed under MIT License. [![License](https://img.shields.io/b
 ```txt
 MIT License
 
-Copyright (c) 2023 EMMANPBARRAMEDA
+Copyright (c) 2025 EMMANPBARRAMEDA [https://emmanpbarrameda.github.io/]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -174,32 +165,67 @@ In short, the MIT License states:
 
 <!-- ------ -->
 
+## 🚀 **Download Installer (for Users)**
+**Download the installer of _Employee Payroll Management System_ below:**
+
+> | **Version** | **Description**           | **Download**                                                                 |
+> |-------------|---------------------------|------------------------------------------------------------------------------|
+> | 2.0.0       | Initial Public Release     | [Download Installer](https://mega.nz/file/yw4U2DgY#M9TaPobCsxQK0bNqMKvr4f69rBlSeB9ohrPu_7CWy5M) |
+
+> _Follow the installation steps and feel free to explore the application._
+<br><br>
+
+<!-- ------ -->
+
+## ⚙️ **Dependencies for Java Developers**
+Make sure the following are installed on your system:
+
+- [Java JDK 11](https://mega.nz/file/msIwmYjC#qpJL7LFHxTwUkI3jauAH2GQE_xM8ULeVPojfSsZ0KAY)
+- [NetBeans Apache IDE v12.0](https://netbeans.apache.org/front/main/download/nb120/nb120/)
+- [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) (for managing the MySQL database)
+
+<br>
+
+<!-- ------ -->
 
 ## ⚙️ **Download Source Code (for Java Developers)**
-- <b>Download Java Source Code [here](https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/archive/refs/heads/main.zip) </b>
-<br><i>Note: Make sure to Install the Required softwares on [Depencies](#%EF%B8%8F-dependencies-for-java-developers).</i>
 
-- <b>NOTE For Developers: </b>
--- The <b>SQLite database</b> of this application is <b>embedded within the application itself</b>. It is <b>located</b> at the <i>path /src/SystemDB/database.sqlite</i>. You can <b>configure</b> the database using [SQLite Browser](https://github.com/sqlitebrowser/sqlitebrowser/releases).
+**Download Java Source Code [here](https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/archive/refs/heads/main.zip)**  
+> _Note: Make sure to install the required software listed in [Dependencies](#️-dependencies-for-java-developers)._
 
-<br>
+---
 
+### 🛠 **Configuration Required**
 
-## 🚀 **Download Installer (for Users)**
-<b>Download Installer of <i> Employee Payroll Management System </i> below </b>
+> 🗃️ The **MySQL database** is located in the `database` folder of the source code.
 
-> | <b>Version</b> | <b>Description</b> | <b>Download</b> |
-> |---------|-------------|----------|
-> | 2.0.0   | Initial Public release | [Download Installer](https://mega.nz/file/bl53UbyZ#olcvThRQ011ZnKeFxId_uyfchpjHcYGLuSzu6LRGjlk) |
+To run the system using your local MySQL server:
 
-> <i>Follow the installation steps and feel free to explore the application.</i>
-<br>
-<br>
+1. Make sure **MySQL Workbench** is installed and running.
+2. Import the MySQL database from the `database` folder.
+3. Update the `config.properties` file located at the root of the project with your database settings.
+
+#### 📄 Sample `config.properties` file:
+
+```properties
+# Database configuration
+USE_MYSQL=true
+USE_EMBEDDED_SQLITE=false
+
+MYSQL_HOST=localhost
+MYSQL_PORT=3305
+MYSQL_DATABASE=netbeanspayrollsystem
+MYSQL_USER=root
+MYSQL_PASSWORD=password
+
+# Path to SQLite (only used if USE_EMBEDDED_SQLITE=true)
+EMBEDDED_SQLITE_PATH=/SystemDB/database.sqlite
+```
 
 
 <!-- ------ -->
 
-## ⚡ **Account Settings**
+## ⚡ **Account Information**
 - Userlevel: <b> Admin </b>
 > Username: Admin1 <br>
 > Password: 87654321

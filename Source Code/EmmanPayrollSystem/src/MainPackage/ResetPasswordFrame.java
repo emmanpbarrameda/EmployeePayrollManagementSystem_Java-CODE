@@ -81,7 +81,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public ResetPasswordFrame() throws SQLException, IOException {
+    public ResetPasswordFrame() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         this.setIconImage(new ImageIcon(getClass().getResource("/Images/TASKBAR_ICON.png")).getImage());
         ResetPasswordFrame.this.getRootPane().setBorder(new MatteBorder(0, 1, 1, 1, (new Color(0,102,204))));
@@ -128,51 +128,52 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
 
     //-------------------- START VOID CODES HERE --------------------//
 
-    //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rs;
-            try (Statement st = conn.createStatement()) {
-                rs = st.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
-                final String GUITopNameDB = rs.getString("GUINameResetPassword");
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Fetching GUI naming data for Reset Password screen...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(query)) {
+
+            if (rs.next()) {
+                // GUI title for Reset Password
+                String GUITopNameDB = rs.getString("GUINameResetPassword");
                 guiTitle.setText(GUITopNameDB);
                 this.setTitle(GUITopNameDB);
-                
-                //set the Default User
+                System.out.println("[INFO] GUI Title (Reset Password): " + GUITopNameDB);
+
+                // User strings
                 userDB = rs.getString("DefaultUser");
                 userDB_CAPS = rs.getString("DefaultUserCAPS");
-                
-                //set the Default Admin
+                System.out.println("[INFO] User (Normal): " + userDB + " | CAPS: " + userDB_CAPS);
+
+                // Admin strings
                 adminDB = rs.getString("DefaultAdmin");
                 adminDB_CAPS = rs.getString("DefaultAdminCAPS");
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] Admin (Normal): " + adminDB + " | CAPS: " + adminDB_CAPS);
+
+                // Popup titles
                 mainnameString = rs.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
                 mainErrorString = rs.getString("PopupError");
-                
-                st.close();
+                System.out.println("[INFO] Popup Titles - Normal: " + mainnameString + ", Error: " + mainErrorString);
+
+                // Assign to shared strings if needed
+                userString = userDB;
+                userString_CAPS = userDB_CAPS;
+                adminString = adminDB;
+                adminString_CAPS = adminDB_CAPS;
+                mainPopupTitleNormalGUI = mainnameString;
+                mainPopupTitleErrorGUI = mainErrorString;
+
+            } else {
+                System.err.println("[WARN] No data returned from 'guinames' table.");
             }
-            rs.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to load GUI naming data for Reset Password:");
+            e.printStackTrace();
         }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        userString = userDB;
-        userString_CAPS = userDB_CAPS;
-        
-        adminString = adminDB;
-        adminString_CAPS = adminDB_CAPS;
-        
-        mainPopupTitleNormalGUI = mainnameString;
-        
-        mainPopupTitleErrorGUI = mainErrorString;
     }
     
     public void showpasswordcharOLD() {
@@ -423,7 +424,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
             dialog1.setVisible(true);
     }
     
-    public void resetsuccess() throws SQLException, IOException {
+    public void resetsuccess() throws SQLException, IOException, ClassNotFoundException {
         String fullnameString = fullnameTF.getText();
         //ImageIcon printicon = new ImageIcon(getClass().getResource("/Images/excel_64px.png"));
         final JDialog frame = new JDialog();
@@ -505,7 +506,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Password of: "+fullnameTF.getText()+" is Resetted by: "+val+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Password of: "+fullnameTF.getText()+" is Resetted by: "+val+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -936,7 +937,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
             LoginFrame mainLogin= new LoginFrame();
             mainLogin.setVisible(true);
             this.dispose();
-        } catch (SQLException | IOException ex) {
+        } catch (SQLException | IOException | ClassNotFoundException ex) {
             Logger.getLogger(ResetPasswordFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_backBTNActionPerformed
@@ -1024,15 +1025,15 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
         try {
             //check user old password
             Statement st1 = conn.createStatement();
-            ResultSet rspasscheck = st1.executeQuery("SELECT password FROM Users WHERE password like '"+oldPasswordString+"'");
+            ResultSet rspasscheck = st1.executeQuery("SELECT password FROM users WHERE password like '"+oldPasswordString+"'");
 
             //find fullname
             Statement st2 = conn.createStatement();
-            ResultSet rsfullname = st2.executeQuery("select fullname from Users where fullname like '"+'%'+fullnameString+'%'+"'");      
+            ResultSet rsfullname = st2.executeQuery("select fullname from users where fullname like '"+'%'+fullnameString+'%'+"'");      
 
             //check user pincode
             Statement st3 = conn.createStatement();
-            ResultSet rspincodecheck = st3.executeQuery("SELECT pincode FROM Users WHERE pincode like '"+pincodeString+"'");
+            ResultSet rspincodecheck = st3.executeQuery("SELECT pincode FROM users WHERE pincode like '"+pincodeString+"'");
             
             //check if the field is empty
             if (fullnameTF.getText().isEmpty()| oldpasswordTF.getText().isEmpty() | newpasswordTF.getText().isEmpty() | confirmnewpasswordTF.getText().isEmpty()) {
@@ -1092,7 +1093,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
                 String value4 = pincodeTF.getText();
                 
                 if(value2.equals(value3)) {
-                    String query = "UPDATE Users SET password='"+value2+"' WHERE password='"+value1+"' AND fullname='"+fullname+"'";
+                    String query = "UPDATE users SET password='"+value2+"' WHERE password='"+value1+"' AND fullname='"+fullname+"'";
                     try (PreparedStatement pst = conn.prepareStatement(query)) {
                         pst.execute();
                         pst.close();
@@ -1108,9 +1109,12 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
                     newpasswordTF.requestFocusInWindow();
                 }
             }
-        } catch (SQLException | IOException ex) {
+        } catch (SQLException | IOException | ClassNotFoundException ex) {
             Logger.getLogger(ResetPasswordFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
+            //if the attempts is equal to 3/3
+            //if the attempts is equal to 3/3
+            
             
 
             //if the attempts is equal to 3/3
@@ -1341,7 +1345,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
                 login = new LoginFrame();
                 login.setVisible(true);
                 this.dispose();
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ResetPasswordFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         };
@@ -1420,7 +1424,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
                 login = new LoginFrame();
                 login.setVisible(true);
                 this.dispose();
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ResetPasswordFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         };
@@ -1521,7 +1525,7 @@ public final class ResetPasswordFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new ResetPasswordFrame().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ResetPasswordFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

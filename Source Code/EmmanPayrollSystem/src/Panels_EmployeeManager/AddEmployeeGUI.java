@@ -88,7 +88,7 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public AddEmployeeGUI() throws SQLException, IOException {
+    public AddEmployeeGUI() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c=new DBconnection();
@@ -147,45 +147,47 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Loading GUI naming data from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)) {
+
+            if (rsGNaming.next()) {
+                // GUI Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
-                lblTitle.setText(mainAppNameFromDB);
-                //this.setTitle(mainAppNameFromDB);
-                
-                //company name
+                System.out.println("[INFO] MainAppName: " + mainAppNameFromDB);
+
+                // Company Name
                 companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
+                System.out.println("[INFO] CompanyName: " + companyNameFromDB);
+
+                // Currency Symbol
                 pesoSignString = rsGNaming.getString("CurrencySign");
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] CurrencySign: " + pesoSignString);
+
+                // Popup Titles
                 mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
+                System.out.println("[INFO] PopupNormal: " + mainnameString);
+
                 mainErrorString = rsGNaming.getString("PopupError");
-                
-                stGNaming.close();
+                System.out.println("[INFO] PopupError: " + mainErrorString);
+
+                // Optional: assign to external/global variables
+                // mainPopupTitleNormalGUI = mainnameString;
+                // mainPopupTitleErrorGUI = mainErrorString;
+                // mainAppNameString = mainAppNameFromDB;
+
+            } else {
+                System.err.println("[WARN] No data found in 'guinames' table.");
             }
-            rsGNaming.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to load GUI naming data.");
+            e.printStackTrace();
         }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
     }
     
     //GENERATE EMPLOYEE ID VOID
@@ -193,7 +195,7 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
             
     try {
         Statement stCount = conn.createStatement();
-        ResultSet rsCount = stCount.executeQuery("select max(id) from EmployeesRecord");
+        ResultSet rsCount = stCount.executeQuery("select max(id) from employeesrecord");
         rsCount.next();
                 
         rsCount.getString("max(id)");
@@ -268,7 +270,7 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
             String val = txt_emp.getText();
             String fullname = ""+txt_firstname.getText()+" "+txt_surname.getText()+"";
                 
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Added New Employee #"+txt_id.getText()+"-("+fullname+") by Admin: "+val+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Added New Employee #"+txt_id.getText()+"-("+fullname+") by Admin: "+val+"')";
             try (PreparedStatement pstADD = conn.prepareStatement(reg)) {
                 pstADD.executeUpdate();
                 pstADD.close();
@@ -279,7 +281,7 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
     }
     
     //proceed to step two - manage employee allowance
-    public void steptwo_allowance() throws SQLException, IOException {
+    public void steptwo_allowance() throws SQLException, IOException, ClassNotFoundException {
         int step = JOptionPane.showConfirmDialog(null, "<html><center>Do you want to proceed on:<br>Step Two (Manage Employee Allowance)?</center></html>", mainnameString, JOptionPane.YES_NO_OPTION);
         if (step == 0) {
             stepexitBTN.doClick();
@@ -863,83 +865,79 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
     private void addrecordBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addrecordBTNActionPerformed
 
         try {
-            String fullnameString = ""+txt_firstname.getText()+" "+txt_surname.getText()+"";
-            
-            Statement stADD = conn.createStatement();
-            ResultSet rsADD=stADD.executeQuery("select fullname from EmployeesRecord where fullname like '"+'%'+fullnameString+'%'+"'");
-            
-            if (txt_firstname.getText().isEmpty() | txt_surname.getText().isEmpty() | txt_dob.getText().isEmpty() | txt_email.getText().isEmpty()  | txt_tel.getText().isEmpty()  | txt_address.getText().isEmpty()  | txt_dep.getText().isEmpty()  | txt_salary.getText().isEmpty()  | txt_address.getText().isEmpty()  | txt_apt.getText().isEmpty()  | txt_pc.getText().isEmpty()  | txt_desig.getText().isEmpty()  | txt_status.getText().isEmpty()  | txt_doj.getText().isEmpty()  | txt_salary.getText().isEmpty()  | txt_job.getText().isEmpty()) {
-                getToolkit().beep();
-                JOptionPane.showMessageDialog(null,"One of the required field is empty!", mainErrorString,JOptionPane.ERROR_MESSAGE,null);
+            String fullname = txt_firstname.getText() + " " + txt_surname.getText();
+
+            // Check for empty fields
+            if (isAnyFieldEmpty()) {
+                Toolkit.getDefaultToolkit().beep();
+                JOptionPane.showMessageDialog(null, "One of the required fields is empty!", mainErrorString, JOptionPane.ERROR_MESSAGE);
                 txt_firstname.requestFocusInWindow();
-                
-            } else if(rsADD.next()) {
-                getToolkit().beep();
-                JOptionPane.showMessageDialog(null,"Employee is already exists on the Database", mainErrorString,JOptionPane.ERROR_MESSAGE,null);
-                txt_firstname.requestFocusInWindow();
-                //clearall();
-                rsADD.close();
-                stADD.close();
-               
-            //check if the Gender is Selected or not!
-            } else if (genderBTNgroup.getSelection() == null) { 
-                JOptionPane.showMessageDialog(null,"Gender is not selected!", mainErrorString,JOptionPane.ERROR_MESSAGE,null);
-                r_male.requestFocusInWindow();
-            
-            //check if the image if empty or not   
-            } else if (person_image==null) {
-                 JOptionPane.showMessageDialog(null,"You cannot save data without a employee image!", mainErrorString,JOptionPane.ERROR_MESSAGE,null);               
-                 insertpictureBTN.requestFocusInWindow();
-                 
-            } else {
-                int p = JOptionPane.showConfirmDialog(null, "Are you sure you want to add record?", mainnameString,JOptionPane.YES_NO_OPTION);
-                if(p==0){
-                    
-                    try {
-                        String sql ="insert into EmployeesRecord"
-                                + "(first_name,surname,fullname,Dob,Email,"
-                                + "Telephone,Address,Department,"
-                                + "Image,Salary,Gender,Address2,"
-                                + "Post_code, Designation,Status,job_title,Apartment,Date_hired) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
-                        
-                        pst=conn.prepareStatement(sql);
-                        pst.setString(1,txt_firstname.getText());
-                        pst.setString(2,txt_surname.getText());
-                        pst.setString(3,fullnameString);
-                        pst.setString(4,txt_dob.getText());
-                        pst.setString(5,txt_email.getText());
-                        pst.setString(6,txt_tel.getText());
-                        pst.setString(7,txt_address.getText());
-                        pst.setString(8,txt_dep.getText());
-                        pst.setBytes(9,person_image);
-                        
-                        pst.setString(10,txt_salary.getText());
-                        pst.setString(11,gender);
-                        pst.setString(12,txt_add2.getText());
-                        pst.setString(13,txt_pc.getText());
-                        pst.setString(14,txt_desig.getText());
-                        pst.setString(15,txt_status.getText());
-                        pst.setString(16,txt_job.getText());
-                        pst.setString(17,txt_apt.getText());
-                        pst.setString(18,txt_doj.getText());
-                        
-                        pst.executeUpdate();
-                        pst.close();
-                        JOptionPane.showMessageDialog(null,"Data of Employee #"+txt_id.getText()+" is saved successfully!", mainnameString,JOptionPane.INFORMATION_MESSAGE,null);
-                        auditAddEmp();
-                        steptwo_allowance();
-                        clearall();
-                        
-                    } catch (HeadlessException | SQLException | IOException e) {
-                        //JOptionPane.showMessageDialog(null,e);
+                return;
+            }
+
+            // Check if record already exists
+            String query = "SELECT fullname FROM employeesrecord WHERE fullname LIKE ?";
+            try (PreparedStatement psCheck = conn.prepareStatement(query)) {
+                psCheck.setString(1, "%" + fullname + "%");
+                try (ResultSet rsCheck = psCheck.executeQuery()) {
+                    if (rsCheck.next()) {
+                        Toolkit.getDefaultToolkit().beep();
+                        JOptionPane.showMessageDialog(null, "Employee already exists in the database.", mainErrorString, JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
-                    //Logger.getLogger(AddEmployeeGUI.class.getName()).log(Level.SEVERE, null, ex);
-                    
                 }
             }
-        } catch (SQLException ex) {
-            //Logger.getLogger(AddEmployeeGUI.class.getName()).log(Level.SEVERE, null, ex);
+
+            // Check gender selected
+            if (genderBTNgroup.getSelection() == null) {
+                JOptionPane.showMessageDialog(null, "Gender is not selected!", mainErrorString, JOptionPane.ERROR_MESSAGE);
+                r_male.requestFocusInWindow();
+                return;
+            }
+
+            // Check image is selected
+            if (person_image == null) {
+                JOptionPane.showMessageDialog(null, "You cannot save data without an employee image!", mainErrorString, JOptionPane.ERROR_MESSAGE);
+                insertpictureBTN.requestFocusInWindow();
+                return;
+            }
+
+            // Confirm add
+            int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to add the record?", mainnameString, JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                String sql = "INSERT INTO employeesrecord (first_name, surname, fullname, Dob, Email, Telephone, Address, Department, Image, Salary, Gender, Address2, Post_code, Designation, Status, job_title, Apartment, Date_hired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement pst = conn.prepareStatement(sql)) {
+                    pst.setString(1, txt_firstname.getText());
+                    pst.setString(2, txt_surname.getText());
+                    pst.setString(3, fullname);
+                    pst.setString(4, txt_dob.getText());
+                    pst.setString(5, txt_email.getText());
+                    pst.setString(6, txt_tel.getText());
+                    pst.setString(7, txt_address.getText());
+                    pst.setString(8, txt_dep.getText());
+                    pst.setBytes(9, person_image);
+                    pst.setString(10, txt_salary.getText());
+                    pst.setString(11, gender);
+                    pst.setString(12, txt_add2.getText());
+                    pst.setString(13, txt_pc.getText());
+                    pst.setString(14, txt_desig.getText());
+                    pst.setString(15, txt_status.getText());
+                    pst.setString(16, txt_job.getText());
+                    pst.setString(17, txt_apt.getText());
+                    pst.setString(18, txt_doj.getText());
+                    pst.executeUpdate();
+                }
+
+                JOptionPane.showMessageDialog(null, "Data of Employee #" + txt_id.getText() + " is saved successfully!", mainnameString, JOptionPane.INFORMATION_MESSAGE);
+                auditAddEmp();
+                steptwo_allowance();
+                clearall();
+            }
+        } catch (HeadlessException | IOException | ClassNotFoundException | SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), mainErrorString, JOptionPane.ERROR_MESSAGE);
         }
+        
     }//GEN-LAST:event_addrecordBTNActionPerformed
 
     private void clearBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBTNActionPerformed
@@ -1203,7 +1201,7 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new AddEmployeeGUI().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(AddEmployeeGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
@@ -1269,4 +1267,23 @@ public final class AddEmployeeGUI extends javax.swing.JDialog {
     byte[] person_image = null;
     
     private String gender;
+    
+    private boolean isAnyFieldEmpty() {
+        return txt_firstname.getText().isEmpty()
+                || txt_surname.getText().isEmpty()
+                || txt_dob.getText().isEmpty()
+                || txt_email.getText().isEmpty()
+                || txt_tel.getText().isEmpty()
+                || txt_address.getText().isEmpty()
+                || txt_dep.getText().isEmpty()
+                || txt_salary.getText().isEmpty()
+                || txt_apt.getText().isEmpty()
+                || txt_pc.getText().isEmpty()
+                || txt_desig.getText().isEmpty()
+                || txt_status.getText().isEmpty()
+                || txt_doj.getText().isEmpty()
+                || txt_job.getText().isEmpty()
+                || txt_add2.getText().isEmpty();
+    }
+    
 }

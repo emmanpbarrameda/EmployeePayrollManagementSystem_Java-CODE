@@ -65,8 +65,9 @@ public final class AboutSystem extends javax.swing.JDialog {
      * Creates new form AddEmployeeGUI
      * @throws java.sql.SQLException
      * @throws java.io.IOException
+     * @throws java.lang.ClassNotFoundException
      */
-    public AboutSystem() throws SQLException, IOException {
+    public AboutSystem() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c=new DBconnection();
@@ -99,45 +100,50 @@ public final class AboutSystem extends javax.swing.JDialog {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Attempting to load GUI naming data from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)) {
+
+            if (rsGNaming.next()) {
+                // GUI Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
                 lblTitle.setText(mainAppNameFromDB);
                 this.setTitle(mainAppNameFromDB);
-                
-                //company name
+                System.out.println("[INFO] Main App Name: " + mainAppNameFromDB);
+
+                // Company Name
                 companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
+                System.out.println("[INFO] Company Name: " + companyNameFromDB);
+
+                // Currency Symbol
                 pesoSignString = rsGNaming.getString("CurrencySign");
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] Currency Symbol: " + pesoSignString);
+
+                // Normal Popup Title
                 mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
+                System.out.println("[INFO] Popup Normal Title: " + mainnameString);
+
+                // Error Popup Title
                 mainErrorString = rsGNaming.getString("PopupError");
-                
-                stGNaming.close();
+                System.out.println("[INFO] Popup Error Title: " + mainErrorString);
+
+            } else {
+                System.err.println("[WARN] No rows returned from 'guinames' table.");
             }
-            rsGNaming.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to retrieve GUI naming data: " + e.getMessage());
+            e.printStackTrace();
         }
-                
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
+
+        // (Optional) Assign to other string references if needed
+        // mainPopupTitleNormalGUI = mainnameString;
+        // mainPopupTitleErrorGUI = mainErrorString;
+        // mainAppNameString = mainAppNameFromDB;
     }
     
     public void auditEdit() {
@@ -153,7 +159,7 @@ public final class AboutSystem extends javax.swing.JDialog {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Name is Edited by "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Name is Edited by "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -437,7 +443,7 @@ public final class AboutSystem extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new AboutSystem().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(AboutSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

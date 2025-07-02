@@ -89,7 +89,7 @@ public final class EditGUIOptions extends javax.swing.JDialog {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public EditGUIOptions() throws SQLException, IOException {
+    public EditGUIOptions() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c = new DBconnection();
@@ -142,46 +142,48 @@ public final class EditGUIOptions extends javax.swing.JDialog {
 
     //-------------------- START VOID CODES HERE --------------------//
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Loading GUI naming data from 'guinames' table...");
 
-                //set the GUI Title
-                mainAppNameFromDB = rsGNaming.getString("MainAppName");
+        String query = "SELECT * FROM guinames";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            if (rs.next()) {
+                // GUI Title
+                mainAppNameFromDB = rs.getString("MainAppName");
                 lblTitle.setText(mainAppNameFromDB);
                 this.setTitle(mainAppNameFromDB);
+                System.out.println("[INFO] Main App Title: " + mainAppNameFromDB);
 
-                //company name
-                companyNameFromDB = rsGNaming.getString("MainCompanyName");
+                // Company Name
+                companyNameFromDB = rs.getString("MainCompanyName");
+                System.out.println("[INFO] Company Name: " + companyNameFromDB);
 
-                //currency symbol
-                pesoSignString = rsGNaming.getString("CurrencySign");
+                // Currency Symbol
+                pesoSignString = rs.getString("CurrencySign");
+                System.out.println("[INFO] Currency Symbol: " + pesoSignString);
 
-                //set the Default Normal Popups Title Message
-                mainnameString = rsGNaming.getString("PopupNormal");
+                // Popup Titles
+                mainnameString = rs.getString("PopupNormal");
+                mainErrorString = rs.getString("PopupError");
+                System.out.println("[INFO] Popup Normal Title: " + mainnameString);
+                System.out.println("[INFO] Popup Error Title: " + mainErrorString);
 
-                //set the Default Error Popups Title Message
-                mainErrorString = rsGNaming.getString("PopupError");
-
-                //set the main depending
-                maindependingFromDB = rsGNaming.getString("Depending");
+                // Main Depending (Custom label/indicator)
+                maindependingFromDB = rs.getString("Depending");
                 lblmain.setText(maindependingFromDB);
+                System.out.println("[INFO] Main Depending Label: " + maindependingFromDB);
 
-                stGNaming.close();
+            } else {
+                System.err.println("[WARN] No data found in 'guinames' table.");
             }
-            rsGNaming.close();
 
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to load GUI naming data: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        //mainPopupTitleNormalGUI = mainnameString;
-        //mainPopupTitleErrorGUI = mainErrorString;
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
     }
 
     public void auditEdit() {
@@ -197,7 +199,7 @@ public final class EditGUIOptions extends javax.swing.JDialog {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg = "insert into Audit (emp_id, date, status) values ('" + val + "','" + value0 + " / " + value1 + "','Name is Edited by " + txt_emp.getText() + "')";
+            String reg = "insert into audit (emp_id, date, status) values ('" + val + "','" + value0 + " / " + value1 + "','Name is Edited by " + txt_emp.getText() + "')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -466,7 +468,7 @@ public final class EditGUIOptions extends javax.swing.JDialog {
 
     private void insertGUINaming() throws SQLException {
         try {
-            String query = "SELECT * FROM GUINames WHERE Depending=?";
+            String query = "SELECT * FROM guinames WHERE Depending=?";
             ResultSet rsGUINaming;
             try (PreparedStatement pstGUINaming = conn.prepareStatement(query)) {
                 pstGUINaming.setString(1, lblmain.getText());
@@ -1452,7 +1454,7 @@ public final class EditGUIOptions extends javax.swing.JDialog {
                     String value = lblmain.getText();
                     String query;
 
-                    query = "UPDATE GUINames SET MainAppName=?,MainCompanyName=?,MainTopAppName=?,PopupNormal=?,PopupError=?,CurrencySign=?,CurrencyCode=?,OvertimeRate=?,RPHRate=?,GUINameLogin=?,GUINameResetPassword=?,DefaultUser=?,DefaultUserCAPS=?,DefaultAdmin=?,DefaultAdminCAPS=?,DefaultNone=? WHERE Depending='" + value + "'";
+                    query = "UPDATE guinames SET MainAppName=?,MainCompanyName=?,MainTopAppName=?,PopupNormal=?,PopupError=?,CurrencySign=?,CurrencyCode=?,OvertimeRate=?,RPHRate=?,GUINameLogin=?,GUINameResetPassword=?,DefaultUser=?,DefaultUserCAPS=?,DefaultAdmin=?,DefaultAdminCAPS=?,DefaultNone=? WHERE Depending='" + value + "'";
 
                     try (PreparedStatement pstGNUpdate = conn.prepareStatement(query)) {
                         pstGNUpdate.setString(1, tf1.getText());
@@ -2016,7 +2018,7 @@ public final class EditGUIOptions extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new EditGUIOptions().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EditGUIOptions.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

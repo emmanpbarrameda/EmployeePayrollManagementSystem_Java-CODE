@@ -164,7 +164,7 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public MainNavigationHomePanel_S_ADMIN() throws SQLException, IOException {
+    public MainNavigationHomePanel_S_ADMIN() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
 
         //connection to database
@@ -265,47 +265,52 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
 
     //-------------------- START VOID CODES HERE --------------------//
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Fetching GUI naming data from 'guinames' table...");
 
-                //set the GUI Title
-                mainAppNameFromDB = rsGNaming.getString("MainAppName");
+        String query = "SELECT * FROM guinames";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            if (rs.next()) {
+                // GUI Title
+                mainAppNameFromDB = rs.getString("MainAppName");
                 lblTitle.setText(mainAppNameFromDB);
                 this.setTitle(mainAppNameFromDB);
+                System.out.println("[INFO] MainAppName: " + mainAppNameFromDB);
 
-                //top app name
-                apptopNameFromDB = rsGNaming.getString("MainTopAppName");
+                // Top App Name
+                apptopNameFromDB = rs.getString("MainTopAppName");
                 topappnameLBL.setText(apptopNameFromDB);
+                System.out.println("[INFO] TopAppName: " + apptopNameFromDB);
 
-                //company name
-                companyNameFromDB = rsGNaming.getString("MainCompanyName");
+                // Company Name
+                companyNameFromDB = rs.getString("MainCompanyName");
                 companynameLBL.setText(companyNameFromDB);
+                System.out.println("[INFO] Company Name: " + companyNameFromDB);
 
-                //currency symbol
-                pesoSignString = rsGNaming.getString("CurrencySign");
+                // Currency Symbol
+                pesoSignString = rs.getString("CurrencySign");
+                System.out.println("[INFO] Currency Symbol: " + pesoSignString);
 
-                //set the Default Normal Popups Title Message
-                mainnameString = rsGNaming.getString("PopupNormal");
+                // Popup Titles
+                mainnameString = rs.getString("PopupNormal");
+                mainErrorString = rs.getString("PopupError");
+                System.out.println("[INFO] Popup Normal Title: " + mainnameString);
+                System.out.println("[INFO] Popup Error Title: " + mainErrorString);
 
-                //set the Default Error Popups Title Message
-                mainErrorString = rsGNaming.getString("PopupError");
-
-                stGNaming.close();
+            } else {
+                System.err.println("[WARN] No records found in 'guinames' table.");
             }
-            rsGNaming.close();
 
         } catch (SQLException e) {
+            System.err.println("[ERROR] SQL Exception in GUINaming_DATA: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("[ERROR] Unexpected exception in GUINaming_DATA: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        //mainPopupTitleNormalGUI = mainnameString;
-        //mainPopupTitleErrorGUI = mainErrorString;
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
     }
 
     //setText the username from Auth 
@@ -500,7 +505,7 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
             String values = dateString;
 
             String value = Emp.empId;
-            String reg = "insert into Audit (emp_id,date,status) values ('" + value + "','" + value0 + " / " + values + "','Logged out')";
+            String reg = "insert into audit (emp_id,date,status) values ('" + value + "','" + value0 + " / " + values + "','Logged out')";
             pstLogout = conn.prepareStatement(reg);
             pstLogout.execute();
 
@@ -718,7 +723,7 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
         String value1 = dateString;
         String val = useronlineTF.getText();
         try {
-            String reg = "insert into Audit (emp_id, date, status) values ('" + val + "','" + value0 + " / " + value1 + "','Force shutdown of System by: " + val + "')";
+            String reg = "insert into audit (emp_id, date, status) values ('" + val + "','" + value0 + " / " + value1 + "','Force shutdown of System by: " + val + "')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -826,7 +831,7 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
                     deleteUserLevelFile(); //<-- this void will delete the UserLevel detector
                     deleteUsernameFile(); //<-- this void will delete the username detector, dispose this panel and setVisible(true) the Login.
 
-                } catch (SQLException ex) {
+                } catch (SQLException | ClassNotFoundException ex) {
                     Logger.getLogger(MainNavigationHomePanel_S_ADMIN.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
@@ -869,7 +874,7 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
     }
 
     //delete the Username detector file and the Login panel will become visible(true)
-    public void deleteUsernameFile() {
+    public void deleteUsernameFile() throws ClassNotFoundException {
         try {
             File file = new File(currentRunningPath + "/data/user/" + useronlineTF.getText());
             if (file.delete()) { //delete file
@@ -1845,7 +1850,7 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
                         deleteUserLevelFile(); //<-- this void will delete the UserLevel detector
                         deleteUsernameFile(); //<-- this void will delete the username detector, dispose this panel and setVisible(true) the Login.
 
-                    } catch (SQLException ex) {
+                    } catch (SQLException | ClassNotFoundException ex) {
                         Logger.getLogger(MainNavigationHomePanel_S_ADMIN.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
@@ -2467,7 +2472,7 @@ public final class MainNavigationHomePanel_S_ADMIN extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new MainNavigationHomePanel_S_ADMIN().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(MainNavigationHomePanel_S_ADMIN.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

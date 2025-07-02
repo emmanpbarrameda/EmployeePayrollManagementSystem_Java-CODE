@@ -90,19 +90,19 @@ public final class LoginFrame extends javax.swing.JFrame {
     //string to check current loggedIn user
     String currentLoggedInUser = null;
     //string to check current loggedIn user
-    String currentLoggedInLevel = null;    
-    
+    String currentLoggedInLevel = null;
+
     //for checking of UserName and UserLevel on AutoLogin or Not AutoLogin
     String usernameString = null;
     String userlevelString = null;
-    
+
     /**
      * Creates new form LoginFrame
      *
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public LoginFrame() throws SQLException, IOException {
+    public LoginFrame() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         this.setIconImage(new ImageIcon(getClass().getResource("/Images/TASKBAR_ICON.png")).getImage());
         LoginFrame.this.getRootPane().setBorder(new MatteBorder(0, 1, 1, 1, (new Color(0, 102, 204))));
@@ -157,74 +157,90 @@ public final class LoginFrame extends javax.swing.JFrame {
 
     //-------------------- START VOID CODES HERE --------------------//
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rs;
-            try (Statement st = conn.createStatement()) {
-                rs = st.executeQuery("select * FROM GUINames");
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Fetching GUI naming data from database...");
 
-                //set the GUI Title
-                final String GUITopNameDB = rs.getString("GUINameLogin");
-                guiTitle.setText(GUITopNameDB);
-                this.setTitle(GUITopNameDB);
+        String query = "SELECT * FROM guinames";
 
-                //set the Default User
-                userDB = rs.getString("DefaultUser");
-                userDB_CAPS = rs.getString("DefaultUserCAPS");
+        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(query)) {
 
-                //set the Default Admin
-                adminDB = rs.getString("DefaultAdmin");
-                adminDB_CAPS = rs.getString("DefaultAdminCAPS");
-
-                //set the Default Normal Popups Title Message
-                mainnameString = rs.getString("PopupNormal");
-
-                //set the Default Error Popups Title Message
-                mainErrorString = rs.getString("PopupError");
-
-                st.close();
+            if (!rs.next()) {
+                System.out.println("[WARNING] No data found in guinames table.");
+                return;
             }
-            rs.close();
+
+            // GUI Title
+            String GUITopNameDB = rs.getString("GUINameLogin");
+            guiTitle.setText(GUITopNameDB);
+            this.setTitle(GUITopNameDB);
+            System.out.println("[DEBUG] GUI Title set to: " + GUITopNameDB);
+
+            // User info
+            userDB = rs.getString("DefaultUser");
+            userDB_CAPS = rs.getString("DefaultUserCAPS");
+            System.out.println("[DEBUG] Default User: " + userDB + " (" + userDB_CAPS + ")");
+
+            // Admin info
+            adminDB = rs.getString("DefaultAdmin");
+            adminDB_CAPS = rs.getString("DefaultAdminCAPS");
+            System.out.println("[DEBUG] Default Admin: " + adminDB + " (" + adminDB_CAPS + ")");
+
+            // Popup titles
+            mainnameString = rs.getString("PopupNormal");
+            mainErrorString = rs.getString("PopupError");
+            System.out.println("[DEBUG] Normal Popup Title: " + mainnameString);
+            System.out.println("[DEBUG] Error Popup Title: " + mainErrorString);
+
+            // Set static vars
+            userString = userDB;
+            userString_CAPS = userDB_CAPS;
+            adminString = adminDB;
+            adminString_CAPS = adminDB_CAPS;
+            mainPopupTitleNormalGUI = mainnameString;
+            mainPopupTitleErrorGUI = mainErrorString;
+
+            System.out.println("[INFO] GUI naming data loaded successfully.");
 
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to fetch GUI naming data: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        userString = userDB;
-        userString_CAPS = userDB_CAPS;
-
-        adminString = adminDB;
-        adminString_CAPS = adminDB_CAPS;
-
-        mainPopupTitleNormalGUI = mainnameString;
-
-        mainPopupTitleErrorGUI = mainErrorString;
     }
 
     //add item to ComboBox from Database Positions
     public void fillCombo() {
+        System.out.println("[INFO] Filling user level combo box from database...");
 
         userlevelCB.removeAllItems();
-        try {
-            ResultSet rs1;
-            try (Statement st1 = conn.createStatement()) {
-                rs1 = st1.executeQuery("select * FROM GUINames");
 
-                noneCB = rs1.getString("DefaultNone");
-                userlevelCB.addItem(noneCB);
+        String query = "SELECT * FROM guinames";
 
-                userCB = rs1.getString("DefaultUser");
-                userlevelCB.addItem(userCB);
+        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(query)) {
 
-                adminCB = rs1.getString("DefaultAdmin");
-                userlevelCB.addItem(adminCB);
-
-                st1.close();
+            if (!rs.next()) {
+                System.out.println("[WARNING] No data found in guinames table.");
+                return;
             }
-            rs1.close();
+
+            noneCB = rs.getString("DefaultNone");
+            userCB = rs.getString("DefaultUser");
+            adminCB = rs.getString("DefaultAdmin");
+
+            userlevelCB.addItem(noneCB);
+            userlevelCB.addItem(userCB);
+            userlevelCB.addItem(adminCB);
+
             userlevelCB.updateUI();
+
+            System.out.println("[DEBUG] ComboBox values:");
+            System.out.println(" - DefaultNone: " + noneCB);
+            System.out.println(" - DefaultUser: " + userCB);
+            System.out.println(" - DefaultAdmin: " + adminCB);
+            System.out.println("[INFO] ComboBox filled successfully.");
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to fill ComboBox: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -466,10 +482,9 @@ public final class LoginFrame extends javax.swing.JFrame {
         String value1 = dateString;
         String val = usernameTF.getText();
         try {
-            String reg = "insert into Audit (emp_id, date, status) values ('" + val + "','" + value0 + " / " + value1 + "','Logged in as " + userlevelCB.getSelectedItem().toString() + ": " + usernameTF.getText() + "')";
+            String reg = "insert into audit (emp_id, date, status) values ('" + val + "','" + value0 + " / " + value1 + "','Logged in as " + userlevelCB.getSelectedItem().toString() + ": " + usernameTF.getText() + "')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
-                pstAudit.close();
             }
         } catch (SQLException e) {
             System.out.println(e);
@@ -478,14 +493,14 @@ public final class LoginFrame extends javax.swing.JFrame {
 
     //get the userName from the file path for AutoLogin if account is not logged-out
     public void getUsername() {
-        
+
         File f = new File(System.getProperty("user.dir"));
         File dir = f.getAbsoluteFile();
         String path = dir.toString();
 
         System.out.println(path);
 
-        File file1 = new File(path+"/data/user/"+usernameTF.getText() + "");
+        File file1 = new File(path + "/data/user/" + usernameTF.getText() + "");
         try {
             if (file1.createNewFile()) {
                 System.out.println("File created");
@@ -494,17 +509,17 @@ public final class LoginFrame extends javax.swing.JFrame {
         } catch (IOException e) {
         }
     }
-    
+
     //get the userLevel from the file path for AutoLogin if account is not logged-out
     public void getUserLevel() {
-        
+
         File f = new File(System.getProperty("user.dir"));
         File dir = f.getAbsoluteFile();
         String path = dir.toString();
 
         System.out.println(path);
 
-        File file1 = new File(path+"/data/level/"+userlevelCB.getSelectedItem().toString()+"");
+        File file1 = new File(path + "/data/level/" + userlevelCB.getSelectedItem().toString() + "");
         try {
             if (file1.createNewFile()) {
                 System.out.println("File created");
@@ -513,10 +528,9 @@ public final class LoginFrame extends javax.swing.JFrame {
         } catch (IOException e) {
         }
     }
-    
-    
+
     //check if the user will AutologgedIn or not VIA USERNAME.
-    public void checkDestinationPanel() throws IOException, URISyntaxException, SQLException {
+    public void checkDestinationPanel() throws IOException, URISyntaxException, SQLException, ClassNotFoundException {
 
         //find the filepath of the current running/open jar/exe file
         File f = new File(System.getProperty("user.dir"));
@@ -542,7 +556,7 @@ public final class LoginFrame extends javax.swing.JFrame {
                         System.out.println("Files:" + listOfFiles[i].getName());
 
                         currentLoggedInUser = listOfFiles[i].getName();
-                        
+
                         usernameString = currentLoggedInUser;
 
                         //get the directories (folders)
@@ -552,13 +566,11 @@ public final class LoginFrame extends javax.swing.JFrame {
                 }
 
                 userlevelFileDetector();
-                
+
                 //AdminGUI.usernameVoid(usernameString); //set the username from here to main panel
-                
                 //get the username data from username file detector to mainMenu
                 //String fn = currentLoggedInUser;
                 //main.gencode(fn);
-
                 //set visible - true - the Main_Menu
                 //main.setVisible(true);
             }
@@ -572,7 +584,7 @@ public final class LoginFrame extends javax.swing.JFrame {
                     //LoginGUI.setVisible(true);
                     //this is void, no need to declared that this panel will visible.
                     //the LOGIN BUTTON will handle the Visibility of this Panel
-                    
+
                 } else {
                     System.out.println("Cannot create login file. - 1");
                 }
@@ -584,7 +596,7 @@ public final class LoginFrame extends javax.swing.JFrame {
     }
 
     //check if the user will AutologgedIn or not VIA USER-LEVEL.
-    public void userlevelFileDetector() throws IOException, SQLException {
+    public void userlevelFileDetector() throws IOException, SQLException, ClassNotFoundException {
 
         //find the filepath of the current running/open jar/exe file
         File f = new File(System.getProperty("user.dir"));
@@ -597,7 +609,7 @@ public final class LoginFrame extends javax.swing.JFrame {
         //for visible of panels
         MainNavigationHomePanel NormalAdminGUI = new MainNavigationHomePanel();
         MainNavigationHomePanel_S_ADMIN SuperAdminGUI = new MainNavigationHomePanel_S_ADMIN();
-        
+
         try {
 
             //file is already exist (THIS WILL BECOME AUTO LOGIN)
@@ -622,25 +634,25 @@ public final class LoginFrame extends javax.swing.JFrame {
                 }
 
                 //admin
-                if(userCB.equalsIgnoreCase(currentLoggedInLevel)) {
+                if (userCB.equalsIgnoreCase(currentLoggedInLevel)) {
                     usernameString = currentLoggedInUser; //get the username
                     userlevelString = currentLoggedInLevel; //get the userlevel
-                    
+
                     NormalAdminGUI.usernameVoid(usernameString); //set the username from here to userlevel panel
                     NormalAdminGUI.userlevelVoid(userlevelString); //set the userlevel from here to userlevel panel
                     NormalAdminGUI.setVisible(true);
 
-                //ptr
-                } else if(adminCB.equalsIgnoreCase(currentLoggedInLevel)) {
+                    //ptr
+                } else if (adminCB.equalsIgnoreCase(currentLoggedInLevel)) {
                     usernameString = currentLoggedInUser; //get the username
                     userlevelString = currentLoggedInLevel; //get the userlevel
-                    
+
                     SuperAdminGUI.usernameVoid(usernameString); //set the username from here to userlevel panel
                     SuperAdminGUI.userlevelVoid(userlevelString); //set the userlevel from here to userlevel panel
                     SuperAdminGUI.setVisible(true);
-                    
+
                 }
-                
+
             }
 
             //file is not exist (LOGIN FIRST)
@@ -657,24 +669,24 @@ public final class LoginFrame extends javax.swing.JFrame {
                     System.out.println("Cannot create login file. - 1");
                 }
             }
-            
+
         } catch (IOException e) {
             //shutdownProblem(); //<-- display the error
-        }        
+        }
     }
 
     //forceClose/Clicked on X (Exit) button. and the Detector files will become deleted
     public void forceCloseDeleteDetectorFiles() {
-        
+
         //delete the userdata.ecoders
         try {
-            
+
             File f = new File(System.getProperty("user.dir"));
             File dir = f.getAbsoluteFile();
             String path = dir.toString();
 
             File file1 = new File(path + "/data/userdata.ecoders");
-            
+
             if (file1.exists()) {
                 if (file1.delete());
                 System.out.println("File deleted");
@@ -687,7 +699,7 @@ public final class LoginFrame extends javax.swing.JFrame {
             System.err.println("ERR:" + e);
         }
     }
-    
+
     //delete the UserLevel Files
     public static void deleteUserLevelFiles() {
         //find the filepath of the current running/open jar/exe file
@@ -702,7 +714,7 @@ public final class LoginFrame extends javax.swing.JFrame {
             }
         }
     }
-    
+
     //delete the User (USERNAME) Files
     public static void deleteUsernameFiles() {
         //find the filepath of the current running/open jar/exe file
@@ -717,7 +729,7 @@ public final class LoginFrame extends javax.swing.JFrame {
             }
         }
     }
-    
+
     //shutting down void (if there's have a problem on Detector Files)
     private void shutdownProblem() throws IOException {
         final JProgressBar progressBar1 = new JProgressBar();
@@ -748,7 +760,7 @@ public final class LoginFrame extends javax.swing.JFrame {
         }).start();
         dialog1.setVisible(true);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -1140,7 +1152,7 @@ public final class LoginFrame extends javax.swing.JFrame {
                     if (userlevelCB.getSelectedItem().equals(adminString)) {
                         usernameTF.requestFocus();
                         usernameTF.requestFocusInWindow();
-                        String sql = "SELECT * FROM Users WHERE division=? and username=? and password=? ";
+                        String sql = "SELECT * FROM users WHERE division=? and username=? and password=? ";
                         ResultSet rs = null;
                         try (PreparedStatement pst = conn.prepareStatement(sql)) {
                             pst.setString(1, userlevelCB.getSelectedItem().toString());
@@ -1171,7 +1183,7 @@ public final class LoginFrame extends javax.swing.JFrame {
                                 //userlevelFileDetector(); //check if the userLevel file detector is exist or not
                                 getUsername(); //<-- get the username to system data
                                 getUserLevel(); //<-- get the username to system data
-                                
+
                                 Emp.empId = usernameString;
                                 mainAdmin.setVisible(true);
                             } else {
@@ -1190,6 +1202,8 @@ public final class LoginFrame extends javax.swing.JFrame {
                             //pst.close();
                         } catch (AWTException | URISyntaxException ex) {
                             Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         rs.close();
 
@@ -1197,7 +1211,7 @@ public final class LoginFrame extends javax.swing.JFrame {
                     } else if (userlevelCB.getSelectedItem().equals(userString)) {
                         usernameTF.requestFocus();
                         usernameTF.requestFocusInWindow();
-                        String sql = "SELECT * FROM Users WHERE division=? and username=? and password=? ";
+                        String sql = "SELECT * FROM users WHERE division=? and username=? and password=? ";
                         ResultSet rs = null;
                         try (PreparedStatement pst = conn.prepareStatement(sql)) {
                             pst.setString(1, userlevelCB.getSelectedItem().toString());
@@ -1228,7 +1242,7 @@ public final class LoginFrame extends javax.swing.JFrame {
                                 //userlevelFileDetector(); //check if the userLevel file detector is exist or not
                                 getUsername(); //<-- get the username to system data
                                 getUserLevel(); //<-- get the username to system data
-                                
+
                                 Emp.empId = usernameString;
 
                                 mainUser.setVisible(true);
@@ -1247,6 +1261,8 @@ public final class LoginFrame extends javax.swing.JFrame {
 
                             }
                         } catch (AWTException | URISyntaxException ex) {
+                            Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ClassNotFoundException ex) {
                             Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         rs.close();
@@ -1362,7 +1378,7 @@ public final class LoginFrame extends javax.swing.JFrame {
             ResetPasswordFrame mainResetPassword = new ResetPasswordFrame();
             mainResetPassword.setVisible(true);
             this.dispose();
-        } catch (SQLException | IOException ex) {
+        } catch (SQLException | IOException | ClassNotFoundException ex) {
             Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_forgotpasswordBTNActionPerformed
@@ -1546,7 +1562,6 @@ public final class LoginFrame extends javax.swing.JFrame {
     void resetBorder2(JPasswordField border) {
         border.setBorder(new MatteBorder(0, 0, 2, 0, (new Color(12,91,160))));
     }*/
-
     //next code here
     /**
      * @param args the command line arguments
@@ -1568,7 +1583,7 @@ public final class LoginFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new LoginFrame().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

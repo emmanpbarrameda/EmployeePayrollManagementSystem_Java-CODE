@@ -86,7 +86,7 @@ public final class RegisterFrame extends javax.swing.JDialog {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public RegisterFrame() throws SQLException, IOException {
+    public RegisterFrame() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         this.setIconImage(new ImageIcon(getClass().getResource("/Images/TASKBAR_ICON.png")).getImage());
         this.setModal(true);
@@ -125,53 +125,58 @@ public final class RegisterFrame extends javax.swing.JDialog {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rs;
-            try (Statement st = conn.createStatement()) {
-                rs = st.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Loading GUI naming values from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            if (rs.next()) {
+                // GUI Title
                 GUITopNameDB = rs.getString("MainAppName");
                 guiTitle.setText(GUITopNameDB);
                 this.setTitle(GUITopNameDB);
-                
-                //set the Default User
+                System.out.println("[INFO] GUI Title: " + GUITopNameDB);
+
+                // Default User
                 userDB = rs.getString("DefaultUser");
                 userDB_CAPS = rs.getString("DefaultUserCAPS");
-                
-                //set the Default Admin
+                System.out.println("[INFO] Default User: " + userDB + " / " + userDB_CAPS);
+
+                // Default Admin
                 adminDB = rs.getString("DefaultAdmin");
                 adminDB_CAPS = rs.getString("DefaultAdminCAPS");
+                System.out.println("[INFO] Default Admin: " + adminDB + " / " + adminDB_CAPS);
 
-                //set the Default None
+                // Default None
                 noneDB = rs.getString("DefaultNone");
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] Default None: " + noneDB);
+
+                // Popup Titles
                 mainnameString = rs.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
                 mainErrorString = rs.getString("PopupError");
-                
-                st.close();
+                System.out.println("[INFO] Popup Normal Title: " + mainnameString);
+                System.out.println("[INFO] Popup Error Title: " + mainErrorString);
+
+                // Set string variables used throughout the app
+                userString = userDB;
+                userString_CAPS = userDB_CAPS;
+
+                adminString = adminDB;
+                adminString_CAPS = adminDB_CAPS;
+
+                mainPopupTitleNormalGUI = mainnameString;
+                mainPopupTitleErrorGUI = mainErrorString;
+            } else {
+                System.err.println("[WARN] 'guinames' table is empty. No values were loaded.");
             }
-            rs.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to load GUI naming data: " + e.getMessage());
+            e.printStackTrace();
         }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        userString = userDB;
-        userString_CAPS = userDB_CAPS;
-        
-        adminString = adminDB;
-        adminString_CAPS = adminDB_CAPS;
-        
-        mainPopupTitleNormalGUI = mainnameString;
-        
-        mainPopupTitleErrorGUI = mainErrorString;
     }
     
     public void auditRegistered() {
@@ -187,7 +192,7 @@ public final class RegisterFrame extends javax.swing.JDialog {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','"+fullnameTF.getText()+" ("+usernameTF.getText()+") is Registered by: "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','"+fullnameTF.getText()+" ("+usernameTF.getText()+") is Registered by: "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -199,27 +204,28 @@ public final class RegisterFrame extends javax.swing.JDialog {
     
     //add item to ComboBox from Database Positions
     public void fillCombo() {
-        
         userlevelCB.removeAllItems();
-        try {
-            ResultSet rs1;
-            try (Statement st1 = conn.createStatement()) {
-                rs1 = st1.executeQuery("select * FROM GUINames");
-                
-                String noneCB = rs1.getString("DefaultNone");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            if (rs.next()) {
+                String noneCB = rs.getString("DefaultNone");
                 userlevelCB.addItem(noneCB);
-                
-                String userCB =rs1.getString("DefaultUser");
+
+                String userCB = rs.getString("DefaultUser");
                 userlevelCB.addItem(userCB);
 
-                String adminCB =rs1.getString("DefaultAdmin");
+                String adminCB = rs.getString("DefaultAdmin");
                 userlevelCB.addItem(adminCB);
-                
-                st1.close();
             }
-            rs1.close();
-            userlevelCB.updateUI();
+
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "<html><center>Failed to load user level options.<br>ERR: " + e.getMessage() + "</center></html>",
+                mainErrorString, JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -988,10 +994,10 @@ public final class RegisterFrame extends javax.swing.JDialog {
         try {
             //REGISTER BUTTON CODE            
             Statement stUSER = conn.createStatement();
-            ResultSet rsUSER=stUSER.executeQuery("select username from Users where username like '"+'%'+usernameString+'%'+"'");
+            ResultSet rsUSER=stUSER.executeQuery("select username from users where username like '"+'%'+usernameString+'%'+"'");
 
             Statement stFULLNAME = conn.createStatement();
-            ResultSet rsFULLNAME=stFULLNAME.executeQuery("select fullname from Users where fullname like '"+'%'+fullnameString+'%'+"'");
+            ResultSet rsFULLNAME=stFULLNAME.executeQuery("select fullname from users where fullname like '"+'%'+fullnameString+'%'+"'");
             
             if (fullnameTF.getText().isEmpty()|usernameTF.getText().isEmpty()|pincodeTF.getText().isEmpty()|userlevelCB.getSelectedItem().equals("None") | passwordTF.getText().isEmpty() | confirmpasswordTF.getText().isEmpty()) {
                 getToolkit().beep();
@@ -1026,7 +1032,7 @@ public final class RegisterFrame extends javax.swing.JDialog {
             } else {
                 try {
                     if(passwordTF.getText().equals(confirmpasswordTF.getText())){
-                        String query1 = "INSERT INTO Users (division,fullname,password,username,pincode) values(?,?,?,?,?)";
+                        String query1 = "INSERT INTO users (division,fullname,password,username,pincode) values(?,?,?,?,?)";
                         try (PreparedStatement pst1 = conn.prepareStatement(query1)) {
                             pst1.setString(1, userlevelCB.getSelectedItem().toString());
                             pst1.setString(2, fullnameTF.getText());
@@ -1295,7 +1301,7 @@ public final class RegisterFrame extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new RegisterFrame().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(RegisterFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

@@ -45,7 +45,7 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
      * @throws java.sql.SQLException
      */
       
-    public EmployeeManagerMenusPanel() throws IOException, SQLException {
+    public EmployeeManagerMenusPanel() throws IOException, SQLException, ClassNotFoundException {
         initComponents();
         
         DBconnection c=new DBconnection();
@@ -69,44 +69,49 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Loading GUI naming data from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)) {
+
+            if (rsGNaming.next()) {
+                // GUI Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
-                //this.setTitle(mainAppNameFromDB);
-                
-                //company name
+                System.out.println("[INFO] MainAppName: " + mainAppNameFromDB);
+                // Uncomment if you want to set the JFrame title
+                // this.setTitle(mainAppNameFromDB);
+
+                // Company Name
                 companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
+                System.out.println("[INFO] CompanyName: " + companyNameFromDB);
+
+                // Currency Symbol
                 pesoSignString = rsGNaming.getString("CurrencySign");
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] CurrencySign: " + pesoSignString);
+
+                // Popup Titles
                 mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
+                System.out.println("[INFO] PopupNormal: " + mainnameString);
+
                 mainErrorString = rsGNaming.getString("PopupError");
-                
-                stGNaming.close();
+                System.out.println("[INFO] PopupError: " + mainErrorString);
+
+                // Optional: assign to external/global variables
+                // mainPopupTitleNormalGUI = mainnameString;
+                // mainPopupTitleErrorGUI = mainErrorString;
+                // mainAppNameString = mainAppNameFromDB;
+
+            } else {
+                System.err.println("[WARN] No data found in 'guinames' table.");
             }
-            rsGNaming.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to load GUI naming data.");
+            e.printStackTrace();
         }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
     }
     
     /**
@@ -489,7 +494,7 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
                 addemployeeBTN.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); //cursor default
                 AddEmployeeGUI panel = new AddEmployeeGUI();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EmployeeManagerMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -508,7 +513,7 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
                 searchemployeeBTN.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); //cursor default
                 SearchEmployeeGUI panel = new SearchEmployeeGUI();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EmployeeManagerMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -527,7 +532,7 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
                 employeeallowanceBTN.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); //cursor default
                 AllowanceGUI panel = new AllowanceGUI();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EmployeeManagerMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -546,7 +551,7 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
                 updatesalaryBTN.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); //cursor default
                 UpdateSalaryGUI panel = new UpdateSalaryGUI();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EmployeeManagerMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -565,7 +570,7 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
                 deductionBTN.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); //cursor default
                 EmployeeDeductionGUI panel = new EmployeeDeductionGUI();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EmployeeManagerMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -584,7 +589,7 @@ public final class EmployeeManagerMenusPanel extends javax.swing.JPanel {
                 paymentBTN.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); //cursor default
                 SalarySlipGUI panel = new SalarySlipGUI();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EmployeeManagerMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();

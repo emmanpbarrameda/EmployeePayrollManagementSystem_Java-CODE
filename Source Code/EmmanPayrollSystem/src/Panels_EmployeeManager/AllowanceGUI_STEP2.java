@@ -82,7 +82,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public AllowanceGUI_STEP2() throws SQLException, IOException {
+    public AllowanceGUI_STEP2() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c=new DBconnection();
@@ -124,52 +124,59 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Fetching GUI naming and settings from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)) {
+
+            if (rsGNaming.next()) {
+                // Main App Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
+                System.out.println("[INFO] MainAppName: " + mainAppNameFromDB);
                 lblTitle.setText(mainAppNameFromDB);
                 this.setTitle(mainAppNameFromDB);
-                
-                //company name
+
+                // Company Name
                 companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
+                System.out.println("[INFO] MainCompanyName: " + companyNameFromDB);
+
+                // Currency Symbol
                 pesoSignString = rsGNaming.getString("CurrencySign");
-                jLabel10.setText("Total Amount:  "+pesoSignString);
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] CurrencySign: " + pesoSignString);
+                jLabel10.setText("Total Amount:  " + pesoSignString);
+
+                // Popup Titles
                 mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
                 mainErrorString = rsGNaming.getString("PopupError");
-                
+                System.out.println("[INFO] PopupNormal: " + mainnameString);
+                System.out.println("[INFO] PopupError: " + mainErrorString);
+
+                // Overtime Rate
                 OvertimeRateFromDB = rsGNaming.getString("OvertimeRate");
-                //overtimerateTF.setText(OvertimeRateFromDB);
-                
+                System.out.println("[INFO] OvertimeRate: " + OvertimeRateFromDB);
+                // Uncomment if needed: overtimerateTF.setText(OvertimeRateFromDB);
+
+                // RPH Rate
                 RPHRateFromDB = rsGNaming.getString("RPHRate");
-                //rphrateTF.setText(RPHRateFromDB);
-                
-                stGNaming.close();
+                System.out.println("[INFO] RPHRate: " + RPHRateFromDB);
+                // Uncomment if needed: rphrateTF.setText(RPHRateFromDB);
+
+            } else {
+                System.err.println("[WARN] No data returned from 'guinames' table.");
             }
-            rsGNaming.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to load GUI naming data.");
+            e.printStackTrace();
         }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;        
+
+        // Optional: Assign to other global strings
+        // mainPopupTitleNormalGUI = mainnameString;
+        // mainPopupTitleErrorGUI = mainErrorString;
+        // mainAppNameString = mainAppNameFromDB;
     }
 
     //setText the emp-id from previous step #
@@ -278,49 +285,36 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
     public void refreshemployeededucTable() {
         setCellsAlignmentToCenter();
         resetTable();
-        //autorefresh();
+
         try {
-            DefaultTableModel tb = (DefaultTableModel)allowanceTable.getModel();
-            
-            ResultSet rtable;
-            Statement sttable = conn.createStatement();
-                rtable = sttable.executeQuery("select * from Allowance where emp_id like '"+'%'+txt_empid.getText()+'%'+"'");
-                while(rtable.next()) {
-                    
-                    Vector v=new Vector();
-                    
-                    String A =(rtable.getString("emp_id"));
-                    String A1 =(rtable.getString("id"));
-                    String B =(rtable.getString("firstname"));
-                    String C =(rtable.getString("surname"));
-                    String D =(rtable.getString("salary"));
-                    String E =(rtable.getString("rate"));
-                    String F =(rtable.getString("total_allowance"));
-                    String G =(rtable.getString("overtime"));
-                    String H =(rtable.getString("bonus"));
-                    String I =(rtable.getString("medical"));
-                    String J =(rtable.getString("other"));
-                    
-                    v.add(A);
-                    v.add(A1);
-                    v.add(B);
-                    v.add(C);
-                    v.add(D);
-                    v.add(E);
-                    v.add(F);
-                    v.add(G);
-                    v.add(H);
-                    v.add(I);
-                    v.add(J);
-                    
-                    tb.addRow(v);
-                    
-                    sttable.close();
+            DefaultTableModel tb = (DefaultTableModel) allowanceTable.getModel();
+            String query = "SELECT * FROM allowance WHERE emp_id LIKE ?";
+
+            try (PreparedStatement pst = conn.prepareStatement(query)) {
+                pst.setString(1, "%" + txt_empid.getText() + "%");
+
+                try (ResultSet rtable = pst.executeQuery()) {
+                    while (rtable.next()) {
+                        Vector<String> v = new Vector<>();
+
+                        v.add(rtable.getString("emp_id"));
+                        v.add(rtable.getString("id"));
+                        v.add(rtable.getString("firstname"));
+                        v.add(rtable.getString("surname"));
+                        v.add(rtable.getString("salary"));
+                        v.add(rtable.getString("rate"));
+                        v.add(rtable.getString("total_allowance"));
+                        v.add(rtable.getString("overtime"));
+                        v.add(rtable.getString("bonus"));
+                        v.add(rtable.getString("medical"));
+                        v.add(rtable.getString("other"));
+
+                        tb.addRow(v);
+                    }
                 }
-                rtable.close();
+            }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"<html><center>TABLE ERROR 404<br>ERR: "+e+"</center></html>", mainErrorString,JOptionPane.ERROR_MESSAGE,null);            
-            
+            JOptionPane.showMessageDialog(null, "<html><center>TABLE ERROR 404<br>ERR: " + e + "</center></html>", mainErrorString, JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -337,7 +331,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Allowance row count #"+rowchecker+" of Employee #"+txt_empid.getText()+" is Deleted by: "+val+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Allowance row count #"+rowchecker+" of Employee #"+txt_empid.getText()+" is Deleted by: "+val+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.executeUpdate();
                 pstAudit.close();
@@ -348,7 +342,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
     }
     
     //proceed to step 3 - manage employee deduction
-    public void stepthree_deduction() throws SQLException, IOException {
+    public void stepthree_deduction() throws SQLException, IOException, ClassNotFoundException {
         int step = JOptionPane.showConfirmDialog(null, "<html><center>Do you want to proceed on:<br>Step Three (Manage Employee Deduction)?</center></html>", mainnameString, JOptionPane.YES_NO_OPTION);
         if (step == 0) {
             AllowanceGUI_STEP2.this.dispose();
@@ -378,7 +372,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
                     String values = dateString;
                     String val = txt_emp.getText();
 
-                    String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+values+"','Allowance of Employee #"+txt_empid.getText()+" is Updated by: "+val+"')";
+                    String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+values+"','Allowance of Employee #"+txt_empid.getText()+" is Updated by: "+val+"')";
                     try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                         pstAudit.executeUpdate();
                         pstAudit.close();
@@ -1130,7 +1124,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
                     String value9 =  txt_firstname.getText();
                     String value10 = txt_surname.getText();
 
-                    String sql= "insert into Allowance (created_by,emp_id,overtime,medical,bonus,other,salary,rate,total_allowance,firstname,surname) values ('"+value+"','"+value8+"','"+value6+"','"+value3+"','"+value2+"','"+value4+"','"+value1+"','"+value5+"','"+value7+"','"+value9+"','"+value10+"')";
+                    String sql= "insert into allowance (created_by,emp_id,overtime,medical,bonus,other,salary,rate,total_allowance,firstname,surname) values ('"+value+"','"+value8+"','"+value6+"','"+value3+"','"+value2+"','"+value4+"','"+value1+"','"+value5+"','"+value7+"','"+value9+"','"+value10+"')";
 
                     pst=conn.prepareStatement(sql);
                     pst.executeUpdate();
@@ -1143,7 +1137,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
                     clearall();
                 } catch (HeadlessException | SQLException e) {
                     JOptionPane.showMessageDialog(null,e);
-                } catch (IOException ex) {
+                } catch (IOException | ClassNotFoundException ex) {
                     Logger.getLogger(AllowanceGUI_STEP2.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -1221,7 +1215,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
                 removerowBTN.setEnabled(false);
             }
         
-            String sql ="select * from EmployeesRecord where id=? ";
+            String sql ="select * from employeesrecord where id=? ";
 
             pst=conn.prepareStatement(sql);
             pst.setString(1,txt_search.getText());
@@ -1327,7 +1321,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
             } else {
                 int rowRemove = allowanceTable.getSelectedRow();
                 String cell = allowanceTable.getModel().getValueAt(rowRemove, 1).toString();
-                String sql = "DELETE FROM Allowance where id = "+cell+"";
+                String sql = "DELETE FROM allowance where id = "+cell+"";
                 PreparedStatement pstRemoveRow = null;
                 //ResultSet rsRemoveRow =null;
                 try {            
@@ -1524,7 +1518,7 @@ public final class AllowanceGUI_STEP2 extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new AllowanceGUI_STEP2().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(AllowanceGUI_STEP2.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

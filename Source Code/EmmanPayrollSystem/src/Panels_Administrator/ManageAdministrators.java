@@ -79,7 +79,7 @@ public final class ManageAdministrators extends javax.swing.JDialog {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public ManageAdministrators() throws SQLException, IOException {
+    public ManageAdministrators() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c=new DBconnection();
@@ -120,7 +120,7 @@ public final class ManageAdministrators extends javax.swing.JDialog {
         try {
             ResultSet rsGNaming;
             try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
+                rsGNaming = stGNaming.executeQuery("select * FROM guinames");
                 
                 //set the GUI Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
@@ -156,46 +156,50 @@ public final class ManageAdministrators extends javax.swing.JDialog {
     
     public void fillCombo() {
         divisionCB.removeAllItems();
-        try {
-            ResultSet rs1;
-            try (Statement st1 = conn.createStatement()) {
-                rs1 = st1.executeQuery("select * FROM GUINames");
-                
-                noneCB = rs1.getString("DefaultNone");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            if (rs.next()) {
+                noneCB = rs.getString("DefaultNone");
                 divisionCB.addItem(noneCB);
-                
-                userCB =rs1.getString("DefaultUser");
+
+                userCB = rs.getString("DefaultUser");
                 divisionCB.addItem(userCB);
 
-                adminCB =rs1.getString("DefaultAdmin");
+                adminCB = rs.getString("DefaultAdmin");
                 divisionCB.addItem(adminCB);
-                
-                st1.close();
             }
-            rs1.close();
-            divisionCB.updateUI();
+
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "<html><center>Failed to load division items.<br>ERR: " + e.getMessage() + "</center></html>",
+                mainErrorString, JOptionPane.ERROR_MESSAGE);
         }
     }
     
     public void fillCombo1() {
         divisionCB.removeAllItems();
-        try {
-            ResultSet rs1;
-            try (Statement st1 = conn.createStatement()) {
-                rs1 = st1.executeQuery("select * FROM GUINames");
-                
-                userCB =rs1.getString("DefaultUser");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            if (rs.next()) {
+                userCB = rs.getString("DefaultUser");
                 divisionCB.addItem(userCB);
 
-                adminCB =rs1.getString("DefaultAdmin");
+                adminCB = rs.getString("DefaultAdmin");
                 divisionCB.addItem(adminCB);
-                
-                st1.close();
             }
-            rs1.close();
-            divisionCB.updateUI();
+
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "<html><center>Failed to load division items.<br>ERR: " + e.getMessage() + "</center></html>",
+                mainErrorString, JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -212,7 +216,7 @@ public final class ManageAdministrators extends javax.swing.JDialog {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','"+divisionCB.getSelectedItem().toString()+": "+idTF.getText()+"-"+fullnameTF.getText()+" is Updated by: "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','"+divisionCB.getSelectedItem().toString()+": "+idTF.getText()+"-"+fullnameTF.getText()+" is Updated by: "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -235,7 +239,7 @@ public final class ManageAdministrators extends javax.swing.JDialog {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','"+divisionCB.getSelectedItem().toString()+": "+idTF.getText()+"-"+fullnameTF.getText()+" is Deleted by: "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','"+divisionCB.getSelectedItem().toString()+": "+idTF.getText()+"-"+fullnameTF.getText()+" is Deleted by: "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -789,7 +793,7 @@ public final class ManageAdministrators extends javax.swing.JDialog {
 
         int p = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete record?", mainnameString,JOptionPane.YES_NO_OPTION);
         if(p==0){
-            String sql ="delete from Users where fullname=? ";
+            String sql ="delete from users where fullname=? ";
             try{
                 pst=conn.prepareStatement(sql);
                 pst.setString(1, fullnameTF.getText());
@@ -838,7 +842,7 @@ public final class ManageAdministrators extends javax.swing.JDialog {
                 String value3 = fullnameTF.getText();
                 String value4 = divisionCB.getSelectedItem().toString();
 
-                String sql= "update Users set id='"+value1+"', username='"+value2+"', fullname='"+value3+"', division='"+value4+"' where id='"+value1+"' ";
+                String sql= "update users set id='"+value1+"', username='"+value2+"', fullname='"+value3+"', division='"+value4+"' where id='"+value1+"' ";
 
                 pst=conn.prepareStatement(sql);
                 pst.execute();
@@ -921,75 +925,59 @@ public final class ManageAdministrators extends javax.swing.JDialog {
 
     private void searchempBTNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchempBTNActionPerformed
        
-        try {
-            if(txt_search.getText().isEmpty()) {
-                fillCombo();
-                txt_search.requestFocusInWindow();
-                
-                updateBTN.setEnabled(false);
-                deleteBTN.setEnabled(false);
-            
-                divisionCB.setEnabled(false);
-                fullnameTF.setEditable(false);
-                usernameTF.setEditable(false);
-            }
-        
-            String sql ="select * from Users where username=? ";
+        String searchText = txt_search.getText().trim();
 
-            pst=conn.prepareStatement(sql);
-            pst.setString(1,txt_search.getText());
-            rs=pst.executeQuery();
-        try {
-            if (rs.next()) {
-                
-            fillCombo1();
-                
-            String add1 =rs.getString("id");
-            idTF.setText(add1);
+        if (searchText.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Please enter a username to search.", mainErrorString, JOptionPane.WARNING_MESSAGE);
+            fillCombo();
+            txt_search.requestFocusInWindow();
 
-            String add2 =rs.getString("division");
-            divisionCB.setSelectedItem(add2);
+            updateBTN.setEnabled(false);
+            deleteBTN.setEnabled(false);
 
-            String add3 =rs.getString("fullname");
-            fullnameTF.setText(add3);
-
-            String add4 =rs.getString("username");
-            usernameTF.setText(add4);
-            
-            rs.close();
-            pst.close();
-            
-            idTF.requestFocusInWindow();
-            updateBTN.setEnabled(true);
-            deleteBTN.setEnabled(true);
-            
-            divisionCB.setEnabled(true);
-            fullnameTF.setEditable(true);
-            usernameTF.setEditable(true);
-            
-            } else {
-                
-                JOptionPane.showMessageDialog(null,"Employee not found.", mainErrorString,JOptionPane.ERROR_MESSAGE,null);
-                clearall();
-                
-                fillCombo();
-                txt_search.setText("");
-                txt_search.requestFocusInWindow();
-                
-                updateBTN.setEnabled(false);
-                deleteBTN.setEnabled(false);
-            
-                divisionCB.setEnabled(false);
-                fullnameTF.setEditable(false);
-                usernameTF.setEditable(false);
-                
-            }
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(EmployeeDeductionGUI.class.getName()).log(Level.SEVERE, null, ex);
+            divisionCB.setEnabled(false);
+            fullnameTF.setEditable(false);
+            usernameTF.setEditable(false);
+            return;
         }
+
+        String sql = "SELECT * FROM users WHERE username = ?";
+        try (PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setString(1, searchText);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    fillCombo1();
+
+                    idTF.setText(rs.getString("id"));
+                    divisionCB.setSelectedItem(rs.getString("division"));
+                    fullnameTF.setText(rs.getString("fullname"));
+                    usernameTF.setText(rs.getString("username"));
+
+                    idTF.requestFocusInWindow();
+                    updateBTN.setEnabled(true);
+                    deleteBTN.setEnabled(true);
+                    divisionCB.setEnabled(true);
+                    fullnameTF.setEditable(true);
+                    usernameTF.setEditable(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Employee not found.", mainErrorString, JOptionPane.ERROR_MESSAGE);
+                    clearall();
+                    fillCombo();
+                    txt_search.setText("");
+                    txt_search.requestFocusInWindow();
+
+                    updateBTN.setEnabled(false);
+                    deleteBTN.setEnabled(false);
+                    divisionCB.setEnabled(false);
+                    fullnameTF.setEditable(false);
+                    usernameTF.setEditable(false);
+                }
+            }
+
         } catch (SQLException ex) {
             Logger.getLogger(EmployeeDeductionGUI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Database error occurred while searching: " + ex.getMessage(), mainErrorString, JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_searchempBTNActionPerformed
 
@@ -1045,7 +1033,7 @@ public final class ManageAdministrators extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new ManageAdministrators().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ManageAdministrators.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

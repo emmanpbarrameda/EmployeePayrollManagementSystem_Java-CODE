@@ -77,7 +77,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public EmployeeDeductionGUI() throws SQLException, IOException {
+    public EmployeeDeductionGUI() throws SQLException, IOException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c=new DBconnection();
@@ -117,48 +117,50 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Fetching GUI naming data for Deduction Panel from 'guinames' table...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (
+            Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)
+        ) {
+            if (rsGNaming.next()) {
+                // GUI Title
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
+                System.out.println("[INFO] MainAppName: " + mainAppNameFromDB);
                 lblTitle.setText(mainAppNameFromDB);
                 this.setTitle(mainAppNameFromDB);
-                
-                //company name
-                companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
-                pesoSignString = rsGNaming.getString("CurrencySign");
-                jLabel5.setText("Total Deduction: "+pesoSignString);
-                jLabel2.setText("Salary after deduction: "+pesoSignString);
-                        
-                //set the Default Normal Popups Title Message
-                mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
-                mainErrorString = rsGNaming.getString("PopupError");
-                
-                stGNaming.close();
-            }
-            rsGNaming.close();
-            
-        } catch (SQLException e) {
-        }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
 
+                // Company Name
+                companyNameFromDB = rsGNaming.getString("MainCompanyName");
+                System.out.println("[INFO] MainCompanyName: " + companyNameFromDB);
+
+                // Currency Symbol
+                pesoSignString = rsGNaming.getString("CurrencySign");
+                System.out.println("[INFO] CurrencySign: " + pesoSignString);
+                jLabel5.setText("Total Deduction: " + pesoSignString);
+                jLabel2.setText("Salary after deduction: " + pesoSignString);
+
+                // Pop-up Titles
+                mainnameString = rsGNaming.getString("PopupNormal");
+                mainErrorString = rsGNaming.getString("PopupError");
+                System.out.println("[INFO] PopupNormal: " + mainnameString);
+                System.out.println("[INFO] PopupError: " + mainErrorString);
+            } else {
+                System.err.println("[WARN] No rows returned from 'guinames'. Table may be empty.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[ERROR] Exception while fetching data from 'guinames': " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // Optional: Update globals if needed
+        // mainPopupTitleNormalGUI = mainnameString;
+        // mainPopupTitleErrorGUI = mainErrorString;
+        // mainAppNameString = mainAppNameFromDB;
     }
 
     public void clearall() {
@@ -236,44 +238,32 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
     public void refreshemployeededucTable() {
         setCellsAlignmentToCenter();
         resetTable();
-        //autorefresh();
+
         try {
-            DefaultTableModel tb = (DefaultTableModel)empdeducionTable.getModel();
-            
-            ResultSet rtable;
-            try (Statement sttable = conn.createStatement()) {
-                rtable = sttable.executeQuery("select * from Deductions where emp_id like '"+'%'+txt_id.getText()+'%'+"'");
-                while(rtable.next()) {
-                    
-                    Vector v=new Vector();
-                    
-                    String EID1 =(rtable.getString("emp_id"));
-                    String ID1 =(rtable.getString("id"));
-                    String FIRSTNAME1 =(rtable.getString("firstname"));
-                    String SURNAME1 =(rtable.getString("surname"));
-                    String SALARY1 =(rtable.getString("salary"));
-                    String DEDUCTIONAMOUNT1 =(rtable.getString("deduction_amount"));
-                    String DEDUCTIONREASON1 =(rtable.getString("deduction_reason"));
-                    
-                    v.add(EID1);
-                    v.add(ID1);
-                    v.add(FIRSTNAME1);
-                    v.add(SURNAME1);
-                    v.add(SALARY1);
-                    v.add(DEDUCTIONAMOUNT1);
-                    v.add(DEDUCTIONREASON1);
-                    
-                    tb.addRow(v);
-                    
-                    sttable.close();
+            DefaultTableModel tb = (DefaultTableModel) empdeducionTable.getModel();
+
+            String query = "SELECT * FROM deductions WHERE emp_id LIKE ?";
+            try (PreparedStatement pst = conn.prepareStatement(query)) {
+                pst.setString(1, "%" + txt_id.getText() + "%");
+
+                try (ResultSet rtable = pst.executeQuery()) {
+                    while (rtable.next()) {
+                        Vector<String> v = new Vector<>();
+                        v.add(rtable.getString("emp_id"));
+                        v.add(rtable.getString("id"));
+                        v.add(rtable.getString("firstname"));
+                        v.add(rtable.getString("surname"));
+                        v.add(rtable.getString("salary"));
+                        v.add(rtable.getString("deduction_amount"));
+                        v.add(rtable.getString("deduction_reason"));
+                        tb.addRow(v);
+                    }
                 }
             }
-            rtable.close();
+
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"<html><center>TABLE ERROR 404<br>ERR: "+e+"</center></html>", mainErrorString,JOptionPane.ERROR_MESSAGE,null);            
-            
+            JOptionPane.showMessageDialog(null, "<html><center>TABLE ERROR 404<br>ERR: " + e + "</center></html>", mainErrorString, JOptionPane.ERROR_MESSAGE, null);
         }
-        
     }
     
     public void defaultTable() {
@@ -295,7 +285,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
         String value1 = dateString;
         String val = lbl_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Deduction row count #"+rowchecker+" of Employee #"+txt_id.getText()+" is Deleted by: "+val+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Deduction row count #"+rowchecker+" of Employee #"+txt_id.getText()+" is Deleted by: "+val+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -700,6 +690,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
         lbl_emp.setText("emp");
         jPanel1.add(lbl_emp, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 790, 150, 20));
 
+        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jLabel11.setText("Search Employee ID :");
         jPanel1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, 20));
 
@@ -997,7 +988,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
             String value3 = lbl_emp.getText();
             try {
 
-                String sql ="insert into Deductions (firstname,surname,salary,deduction_amount,deduction_reason,emp_id,made_by) values (?,?,?,?,?,?,'"+value3+"')";
+                String sql ="insert into deductions (firstname,surname,salary,deduction_amount,deduction_reason,emp_id,made_by) values (?,?,?,?,?,?,'"+value3+"')";
                 pst=conn.prepareStatement(sql);
                 pst.setString(1,txt_firstname.getText());
                 pst.setString(2,txt_surname.getText());
@@ -1028,7 +1019,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
                 String values = dateString;
                 String val = lbl_emp.getText();
 
-                String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+values+"','Deduction of Employee #"+txt_id.getText()+" is Updated by: "+val+"')";
+                String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+values+"','Deduction of Employee #"+txt_id.getText()+" is Updated by: "+val+"')";
                 pst=conn.prepareStatement(reg);
                 pst.execute();
                 refreshtableBTN.doClick();
@@ -1111,7 +1102,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
                 refreshtableBTN.setEnabled(false);
             }
                 
-            String sql ="select * from EmployeesRecord where id=? ";
+            String sql ="select * from employeesrecord where id=? ";
                 
             pst=conn.prepareStatement(sql);
             pst.setString(1,txt_search.getText());
@@ -1298,7 +1289,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
             } else {
                 int rowRemove = empdeducionTable.getSelectedRow();
                 String cell = empdeducionTable.getModel().getValueAt(rowRemove, 1).toString();
-                String sql = "DELETE FROM Deductions where id = "+cell+"";
+                String sql = "DELETE FROM deductions where id = "+cell+"";
                 PreparedStatement pstRemoveRow = null;
                 //ResultSet rsRemoveRow =null;
                 try {
@@ -1345,7 +1336,7 @@ public final class EmployeeDeductionGUI extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new EmployeeDeductionGUI().setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(EmployeeDeductionGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

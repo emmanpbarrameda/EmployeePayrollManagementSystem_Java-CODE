@@ -57,7 +57,7 @@ public final class AuditSystemGUI extends javax.swing.JDialog {
      * Creates new form AddEmployeeGUI
      * @throws java.io.IOException
      */
-    public AuditSystemGUI() throws IOException {
+    public AuditSystemGUI() throws IOException, SQLException, ClassNotFoundException {
         initComponents();
         //connection to database
         DBconnection c=new DBconnection();
@@ -95,7 +95,7 @@ public final class AuditSystemGUI extends javax.swing.JDialog {
     
     private void Update_table3() {  
         try {
-            String sql ="select * from Audit";
+            String sql ="select * from audit";
         
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
@@ -148,57 +148,45 @@ public final class AuditSystemGUI extends javax.swing.JDialog {
     }
     
     public void RefreshAdminAuditTable() {
-        
-        if(txt_search.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null,"Search field is empty.", mainErrorString,JOptionPane.ERROR_MESSAGE,null);
-            removerowBTN.setEnabled(false);
-            refreshactivitiesBTN.setEnabled(false);
-            txt_search.requestFocusInWindow();
 
-        } else if(txt_search.getText().equals(" ")) {
-            JOptionPane.showMessageDialog(null,"Admin not found.", mainErrorString,JOptionPane.ERROR_MESSAGE,null);
+        if (txt_search.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Search field is empty.", mainErrorString, JOptionPane.ERROR_MESSAGE, null);
             removerowBTN.setEnabled(false);
             refreshactivitiesBTN.setEnabled(false);
             txt_search.requestFocusInWindow();
-            
-        } else {
+            return;
+        }
+
         setCellsAlignmentToCenter();
         resetTable();
-        //autorefresh();
+
         try {
-            DefaultTableModel tb = (DefaultTableModel)auditadminactTable.getModel();
-            
-            ResultSet rtable;
-            try (Statement sttable = conn.createStatement()) {
-                rtable = sttable.executeQuery("select * from Audit where emp_id like '"+'%'+txt_search.getText()+'%'+"'");
-                while(rtable.next()) {
-                    
-                    Vector v=new Vector();
-                    
-                    String ADMINID =(rtable.getString("emp_id"));
-                    String ACTIVITYNUM =(rtable.getString("audit_id"));
-                    String DATE =(rtable.getString("date"));
-                    String ACTIVITYSTATUS =(rtable.getString("status"));
-                    
-                    v.add(ADMINID);
-                    v.add(ACTIVITYNUM);
-                    v.add(DATE);
-                    v.add(ACTIVITYSTATUS);
-                    
-                    tb.addRow(v);
+            DefaultTableModel tb = (DefaultTableModel) auditadminactTable.getModel();
+            String query = "SELECT * FROM audit WHERE emp_id LIKE ?";
+
+            try (PreparedStatement pst = conn.prepareStatement(query)) {
+                pst.setString(1, "%" + txt_search.getText().trim() + "%");
+
+                try (ResultSet rtable = pst.executeQuery()) {
+                    while (rtable.next()) {
+                        Vector<String> v = new Vector<>();
+
+                        v.add(rtable.getString("emp_id"));       // ADMIN ID
+                        v.add(rtable.getString("audit_id"));     // ACTIVITY NUMBER
+                        v.add(rtable.getString("date"));         // DATE
+                        v.add(rtable.getString("status"));       // ACTIVITY STATUS
+
+                        tb.addRow(v);
+                    }
                 }
             }
-            rtable.close();
-            
-            removerowBTN.setEnabled(true);
+
+            removerowBTN.setEnabled(false);
             refreshactivitiesBTN.setEnabled(true);
-            
+
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"<html><center>TABLE ERROR 404<br>ERR: "+e+"</center></html>", mainErrorString,JOptionPane.ERROR_MESSAGE,null);            
-            
+            JOptionPane.showMessageDialog(null, "<html><center>TABLE ERROR 404<br>ERR: " + e + "</center></html>", mainErrorString, JOptionPane.ERROR_MESSAGE, null);
         }
-        }
-        
     }
     
     /**
@@ -573,7 +561,7 @@ public final class AuditSystemGUI extends javax.swing.JDialog {
         RefreshAdminAuditTable();
         /*try {
 
-            String sql ="select * from Audit where emp_id=? ";
+            String sql ="select * from audit where emp_id=? ";
 
             pst=conn.prepareStatement(sql);
             pst.setString(1,txt_search.getText());
@@ -649,7 +637,7 @@ public final class AuditSystemGUI extends javax.swing.JDialog {
 
         //row count is greater than 1;
         if(auditadminactTable.getModel().getRowCount()>=1) {
-            removerowBTN.setEnabled(true);
+            removerowBTN.setEnabled(false);
 
             //no row is selected
             if(rowchecker == -1) {
@@ -659,7 +647,7 @@ public final class AuditSystemGUI extends javax.swing.JDialog {
             } else {
                 int rowRemove = auditadminactTable.getSelectedRow();
                 String cell = auditadminactTable.getModel().getValueAt(rowRemove, 1).toString();
-                String sql = "DELETE FROM Audit where audit_id = "+cell+"";
+                String sql = "DELETE FROM audit where audit_id = "+cell+"";
                 PreparedStatement pstRemoveRow = null;
                 //ResultSet rsRemoveRow =null;
                 try {
@@ -705,7 +693,7 @@ public final class AuditSystemGUI extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 new AuditSystemGUI().setVisible(true);
-            } catch (IOException ex) {
+            } catch (IOException | SQLException | ClassNotFoundException ex) {
                 Logger.getLogger(AuditSystemGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

@@ -95,7 +95,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
      * @throws java.sql.SQLException
      */
       
-    public AdminMenusPanel() throws IOException, SQLException {
+    public AdminMenusPanel() throws IOException, SQLException, ClassNotFoundException {
         initComponents();
         
         DBconnection c=new DBconnection();
@@ -122,44 +122,49 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
     //-------------------- START VOID CODES HERE --------------------//
     
     //GUINaming from Database
-    public void GUINaming_DATA() throws SQLException {
-        try {
-            ResultSet rsGNaming;
-            try (Statement stGNaming = conn.createStatement()) {
-                rsGNaming = stGNaming.executeQuery("select * FROM GUINames");
-                
-                //set the GUI Title
+    public void GUINaming_DATA() {
+        System.out.println("[INFO] Loading GUI naming data...");
+
+        String query = "SELECT * FROM guinames";
+
+        try (Statement stGNaming = conn.createStatement();
+            ResultSet rsGNaming = stGNaming.executeQuery(query)) {
+
+            if (rsGNaming.next()) {
+                // GUI title (commented out in your original)
                 mainAppNameFromDB = rsGNaming.getString("MainAppName");
-                //this.setTitle(mainAppNameFromDB);
-                
-                //company name
+                System.out.println("[INFO] Main App Name: " + mainAppNameFromDB);
+                // this.setTitle(mainAppNameFromDB); // uncomment if needed
+
+                // Company name
                 companyNameFromDB = rsGNaming.getString("MainCompanyName");
-                
-                //currency symbol
+                System.out.println("[INFO] Company Name: " + companyNameFromDB);
+
+                // Currency symbol
                 pesoSignString = rsGNaming.getString("CurrencySign");
-                
-                //set the Default Normal Popups Title Message
+                System.out.println("[INFO] Currency Symbol: " + pesoSignString);
+
+                // Popup title (normal)
                 mainnameString = rsGNaming.getString("PopupNormal");
-                
-                //set the Default Error Popups Title Message
+                System.out.println("[INFO] Popup Title (Normal): " + mainnameString);
+
+                // Popup title (error)
                 mainErrorString = rsGNaming.getString("PopupError");
-                
-                stGNaming.close();
+                System.out.println("[INFO] Popup Title (Error): " + mainErrorString);
+
+                // Optionally assign to global strings if needed:
+                // mainPopupTitleNormalGUI = mainnameString;
+                // mainPopupTitleErrorGUI = mainErrorString;
+                // mainAppNameString = mainAppNameFromDB;
+
+            } else {
+                System.err.println("[WARN] No rows returned from 'guinames' table.");
             }
-            rsGNaming.close();
-            
+
         } catch (SQLException e) {
+            System.err.println("[ERROR] Failed to fetch GUI naming data:");
+            e.printStackTrace();
         }
-        
-        /*set the TEXT of THE STRING FROM THE LEFT OF THE CODE
-        get the DATA from DATABASE that will set to STRING from the RIGHT OF THIS CODE*/
-        
-        //mainPopupTitleNormalGUI = mainnameString;
-        
-        //mainPopupTitleErrorGUI = mainErrorString;
-        
-        //string 4 panel   //string from db data
-        //mainAppNameString = mainAppNameFromDB;
     }
  
     /*
@@ -209,7 +214,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','All Employees Data is Printed by: "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','All Employees Data is Printed by: "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -232,7 +237,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Employees Allowance Data is Printed by: "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Employees Allowance Data is Printed by: "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -255,7 +260,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Employees Deduction Data is Printed by: "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Employees Deduction Data is Printed by: "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -278,7 +283,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
         String value1 = dateString;
         String val = txt_emp.getText();
         try {
-            String reg= "insert into Audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Database storage folder is opened by: "+txt_emp.getText()+"')";
+            String reg= "insert into audit (emp_id, date, status) values ('"+val+"','"+value0+" / "+value1+"','Database storage folder is opened by: "+txt_emp.getText()+"')";
             try (PreparedStatement pstAudit = conn.prepareStatement(reg)) {
                 pstAudit.execute();
                 pstAudit.close();
@@ -852,7 +857,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
                     stylerow1.setFont(fontrow1);
                     
                     Row row4;
-                    try (ResultSet rsPrintEX = stmtPrintEX.executeQuery("SELECT id,first_name,surname,fullname,Dob,Gender,Email,Telephone,Apartment,Address,Address2,Post_code,Salary,job_title,Date_hired,Department,Designation,Status FROM EmployeesRecord")) {
+                    try (ResultSet rsPrintEX = stmtPrintEX.executeQuery("SELECT id,first_name,surname,fullname,Dob,Gender,Email,Telephone,Apartment,Address,Address2,Post_code,Salary,job_title,Date_hired,Department,Designation,Status FROM employeesrecord")) {
                         while(rsPrintEX.next()) {
                             int a = rsPrintEX.getRow();
                             row4 = worksheet.createRow((short)a);
@@ -946,7 +951,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
                 FileLastLocation3.FileLocation.put(selectedFile.getParentFile().getAbsolutePath());
 
             try {       
-                String sql ="select * from Allowance";
+                String sql ="select * from allowance";
             
                 pst=conn.prepareStatement(sql);
                 rs=pst.executeQuery();
@@ -1065,7 +1070,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
                 FileLastLocation3.FileLocation.put(selectedFile.getParentFile().getAbsolutePath());
             
             try {
-                String sql ="select * from Deductions";
+                String sql ="select * from deductions";
 
                 pst=conn.prepareStatement(sql);
                 rs=pst.executeQuery();
@@ -1201,7 +1206,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
                 manageprintedBTN.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); //cursor default
                 EditGUIOptions panelGuiEdit = new EditGUIOptions();
                 panelGuiEdit.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(AdminMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -1221,7 +1226,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
             try {
                 panel = new AuditSystemGUI();
                 panel.setVisible(true);
-            } catch (IOException ex) {
+            } catch (IOException | SQLException | ClassNotFoundException ex) {
                 Logger.getLogger(AdminMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -1241,7 +1246,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
             try {
                 panel = new RegisterFrame();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(AdminMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
@@ -1261,7 +1266,7 @@ public final class AdminMenusPanel extends javax.swing.JPanel {
             try {
                 panel = new ManageAdministrators();
                 panel.setVisible(true);
-            } catch (SQLException | IOException ex) {
+            } catch (SQLException | IOException | ClassNotFoundException ex) {
                 Logger.getLogger(AdminMenusPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
