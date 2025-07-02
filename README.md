@@ -159,69 +159,75 @@ In short, the MIT License states:
 
 <b>Make sure to</b>:
 - <b>Give credit to the owner</b> if the project is recompiled or recoded.
-- This code is <b>free to use, modify, and distribute. No fees.</b>
+- This code is <b>free to use, modify, and distribute for personal or academic use. NO FEES.</b>
 <br>
 
 
 <!-- ------ -->
 
-## 🚀 **Download Installer (for Users)**
-**Download the installer of _Employee Payroll Management System_ below:**
+## 🚀 Installtion For End Users
 
-> | **Version** | **Description**           | **Download**                                                                 |
-> |-------------|---------------------------|------------------------------------------------------------------------------|
-> | 2.0.0       | Initial Public Release     | [Download Installer](https://mega.nz/file/yw4U2DgY#M9TaPobCsxQK0bNqMKvr4f69rBlSeB9ohrPu_7CWy5M) |
+### Requirements
+**You MUST install MySQL** unless you configure the system to use SQLite (see configuration below).
 
-> _Follow the installation steps and feel free to explore the application._
-<br><br>
+### Download & Install
+| Version | Description | Download |
+|---------|-------------|----------|
+| 1.3 | Initial Release | [Download Installer](https://mega.nz/file/yw4U2DgY#M9TaPobCsxQK0bNqMKvr4f69rBlSeB9ohrPu_7CWy5M) |
 
-<!-- ------ -->
-
-## ⚙️ **Dependencies for Java Developers**
-Make sure the following are installed on your system:
-
-- [Java JDK 11](https://mega.nz/file/msIwmYjC#qpJL7LFHxTwUkI3jauAH2GQE_xM8ULeVPojfSsZ0KAY)
-- [NetBeans Apache IDE v12.0](https://netbeans.apache.org/front/main/download/nb120/nb120/)
-- [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) (for managing the MySQL database)
-
-<br>
+### Quick Setup Steps
+1. **Install MySQL Server** from [mysql.com](https://dev.mysql.com/downloads/mysql/)
+2. **Download and run** the installer above
+3. **Configure database** (see configuration section below)
 
 <!-- ------ -->
 
-## ⚙️ **Download Source Code (for Java Developers)**
+## 👨‍💻 For Developers
 
-**Download Java Source Code [here](https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE/archive/refs/heads/main.zip)**  
-> _Note: Make sure to install the required software listed in [Dependencies](#️-dependencies-for-java-developers)._
+### Prerequisites
+- [Java JDK 11+](https://mega.nz/file/msIwmYjC#qpJL7LFHxTwUkI3jauAH2GQE_xM8ULeVPojfSsZ0KAY)
+- [NetBeans IDE 12.0+](https://netbeans.apache.org/front/main/download/nb120/nb120/)
+- [MySQL Workbench](https://dev.mysql.com/downloads/workbench/)
 
----
+### Get Source Code
+```bash
+git clone https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Java-CODE.git
+```
 
-### 🛠 **Configuration Required**
+## ⚙️ Database Configuration
 
-> 🗃️ The **MySQL database** is located in the `database` folder of the source code.
-
-To run the system using your local MySQL server:
-
-1. Make sure **MySQL Workbench** is installed and running.
-2. Import the MySQL database from the `database` folder.
-3. Update the `config.properties` file located at the root of the project with your database settings.
-
-#### 📄 Sample `config.properties` file:
-
+### Option 1: MySQL (Recommended)
+1. **Install MySQL Server** and remember your root password
+2. **Import database** from the `database` folder using MySQL Workbench
+3. **Update `config.properties`:**
 ```properties
-# Database configuration
 USE_MYSQL=true
 USE_EMBEDDED_SQLITE=false
-
 MYSQL_HOST=localhost
-MYSQL_PORT=3305
+MYSQL_PORT=3306
 MYSQL_DATABASE=netbeanspayrollsystem
 MYSQL_USER=root
-MYSQL_PASSWORD=password
+MYSQL_PASSWORD=your_password_here
+```
 
-# Path to SQLite (only used if USE_EMBEDDED_SQLITE=true)
+### Option 2: SQLite (No MySQL needed, NOT RECOMMENDED, BUGGY - FOR TESTING ONLY)
+**Update `config.properties`:**
+```properties
+USE_MYSQL=false
+USE_EMBEDDED_SQLITE=true
 EMBEDDED_SQLITE_PATH=/SystemDB/database.sqlite
 ```
 
+## 🔧 Troubleshooting
+
+**Can't connect to database?**
+- Verify MySQL is running
+- Check your password in `config.properties`
+- Try SQLite option if MySQL issues persist
+
+**App won't start?**
+- Ensure Java 11+ is installed
+- Check database configuration
 
 <!-- ------ -->
 
