@@ -159,13 +159,13 @@ In short, the MIT License states:
 
 <b>Make sure to</b>:
 - <b>Give credit to the owner</b> if the project is recompiled or recoded.
-- This code is <b>free to use, modify, and distribute for personal or academic use. NO FEES.</b>
+- This code is <b>free to use and modify for personal or academic use. NO FEES.</b>
 <br>
 
 
 <!-- ------ -->
 
-## 🚀 Installtion For End Users
+## 🚀 Installation For End Users
 
 ### Requirements
 **You MUST install MySQL** unless you configure the system to use SQLite (see configuration below).
@@ -176,7 +176,7 @@ In short, the MIT License states:
 | 1.3 | Initial Release | [Download Installer](https://mega.nz/file/yw4U2DgY#M9TaPobCsxQK0bNqMKvr4f69rBlSeB9ohrPu_7CWy5M) |
 
 ### Quick Setup Steps
-1. **Install MySQL Server** from [mysql.com](https://dev.mysql.com/downloads/mysql/)
+1. **Install MySQL Workbench** from [mysql](https://dev.mysql.com/downloads/workbench/)
 2. **Download and run** the installer above
 3. **Configure database** (see configuration section below)
 
@@ -197,7 +197,7 @@ git clone https://github.com/emmanpbarrameda/EmployeePayrollManagementSystem_Jav
 ## ⚙️ Database Configuration
 
 ### Option 1: MySQL (Recommended)
-1. **Install MySQL Server** and remember your root password
+1. **Install MySQL Workbench** and remember your root credentials
 2. **Import database** from the `database` folder using MySQL Workbench
 3. **Update `config.properties`:**
 ```properties
@@ -222,7 +222,7 @@ EMBEDDED_SQLITE_PATH=/SystemDB/database.sqlite
 
 **Can't connect to database?**
 - Verify MySQL is running
-- Check your password in `config.properties`
+- Check your mysql credentials in `config.properties`
 - Try SQLite option if MySQL issues persist
 
 **App won't start?**
