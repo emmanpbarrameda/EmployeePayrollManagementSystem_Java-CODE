@@ -2,8 +2,8 @@
 <h1 align='center'> EMPLOYEE PAYROLL MANAGEMENT SYSTEM </h1>
 
 <!-- tag line -->
-<h3 align='center'> Employee Payroll Management System<br> using Java Swing GUI (CODE) </h3>
-
+<h3 align='center'> Employee Payroll Management System<br> using Java Swing GUI </h3>
+<h3 align='center'> OPEN SOURCE </h3>
 
 <!-- personal badges -------------------------------------->
 <br>
